@@ -28,6 +28,7 @@
     </scm>
     <properties>
         <java.version>21</java.version>
+        <logback.version>1.5.15</logback.version> <!--to mitigate vulnerability of web and security transitive dependency -->
     </properties>
     <dependencies>
         <dependency>
