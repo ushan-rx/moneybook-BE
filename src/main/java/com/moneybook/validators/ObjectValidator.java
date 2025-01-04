@@ -6,20 +6,19 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.springframework.stereotype.Component;
 
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class ObjectValidator<T>{
+public class ObjectValidator<T> {
 
     private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
 
-    public Set<String> validation(T ObjectToValidate){
+    public Set<String> validate(T ObjectToValidate) {
         Set<ConstraintViolation<T>> violations = validator.validate(ObjectToValidate);
-        if(!violations.isEmpty()){
+        if (!violations.isEmpty()) {
             return violations
                     .stream()
                     .map(ConstraintViolation::getMessage)
