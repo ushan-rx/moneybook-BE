@@ -1,7 +1,8 @@
 package com.moneybook.mappers;
 
-import com.moneybook.dto.NormalUserBriefDto;
-import com.moneybook.dto.NormalUserDto;
+import com.moneybook.dto.user.NormalUserBriefDto;
+import com.moneybook.dto.user.NormalUserCreateDto;
+import com.moneybook.dto.user.NormalUserDto;
 import com.moneybook.entity.NormalUser;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
@@ -16,7 +17,7 @@ public interface NormalUserMapper {
     @Mapping(target = "user_id", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "created_at", ignore = true)
-    NormalUser toNormalUser(NormalUserDto dto);
+    NormalUser toNormalUser(NormalUserCreateDto dto);
 
     @InheritConfiguration
     NormalUserDto fromNormalUser(NormalUser normalUser);

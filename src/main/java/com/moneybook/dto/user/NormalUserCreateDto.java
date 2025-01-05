@@ -1,4 +1,4 @@
-package com.moneybook.dto;
+package com.moneybook.dto.user;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.URL;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NormalUserDto {
+public class NormalUserCreateDto {
 
     @NotBlank(message = "Username cannot be blank")
     @NotNull(message = "Username cannot be blank!")

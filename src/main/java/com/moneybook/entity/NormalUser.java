@@ -1,6 +1,9 @@
 package com.moneybook.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -9,7 +12,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 @Entity
 @NoArgsConstructor
@@ -18,7 +21,6 @@ import java.util.Date;
 @ToString
 @Table(name = "normaluser")
 public class NormalUser {
-
 
     @Id
     @NotBlank(message = "User ID cannot be blank")
@@ -40,10 +42,8 @@ public class NormalUser {
     private String profile_pic;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", updatable = false, nullable = false)
-    private Date created_at;
+    private OffsetDateTime created_at;
 
-    private boolean status;
-
+    private boolean status = true;
 }

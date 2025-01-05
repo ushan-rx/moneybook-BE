@@ -1,4 +1,4 @@
-package com.moneybook.dto;
+package com.moneybook.dto.user;
 
 import lombok.*;
 
