@@ -1,24 +1,20 @@
-package com.moneybook.entity;
+package com.moneybook.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 @Table(name = "normaluser")
 public class NormalUser {
 
@@ -46,4 +42,23 @@ public class NormalUser {
     private OffsetDateTime created_at;
 
     private boolean status = true;
+
+    @OneToMany(mappedBy = "created_by", cascade = CascadeType.ALL, orphanRemoval = true)
+    public List<FriendGroup> groups;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2,8 +2,8 @@ package com.moneybook.service;
 
 import com.moneybook.dto.user.NormalUserCreateDto;
 import com.moneybook.dto.user.NormalUserDto;
-import com.moneybook.entity.NormalUser;
 import com.moneybook.mappers.NormalUserMapper;
+import com.moneybook.model.NormalUser;
 import com.moneybook.repository.NormalUserRepo;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,4 +23,5 @@ public class NormalUserService {
         return NormalUserMapper.MAPPER.fromNormalUser(userCreated);
     }
 
+    //add check username service
 }
