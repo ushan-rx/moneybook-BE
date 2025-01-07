@@ -43,7 +43,7 @@ public class NormalUser {
 
     private boolean status = true;
 
-    @OneToMany(mappedBy = "created_by", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "created_by",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     public List<FriendGroup> groups;
 }
 

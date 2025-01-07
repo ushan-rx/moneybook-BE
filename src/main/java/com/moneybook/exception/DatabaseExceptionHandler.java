@@ -1,7 +1,7 @@
 package com.moneybook.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.moneybook.util.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -10,30 +10,36 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
+@Slf4j
 @RestControllerAdvice
 public class DatabaseExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseExceptionHandler.class);
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorDetails> handleDataIntegrityViolation(DataIntegrityViolationException ex, WebRequest request) {
-        logger.warn("Constraint violation: {}", ex.getMostSpecificCause().getMessage());
-        ErrorDetails errorDetails = new ErrorDetails(
-                new Date(),
-                "A conflict occurred due to duplicate or invalid data.",
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    public ResponseEntity<ApiResponse<Object>> handleDataIntegrityViolation(DataIntegrityViolationException ex, WebRequest request) {
+        log.warn("Constraint violation: {}", ex.getMostSpecificCause().getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.builder()
+                        .timestamp(LocalDateTime.now())
+                        .status(HttpStatus.CONFLICT.value())
+                        .message("A conflict occurred due to duplicate or invalid data.")
+                        .error("Duplicate or invalid data")
+                        .path(request.getDescription(false).replace("uri=", ""))
+                        .build());
     }
 
     @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<ErrorDetails> handleDataAccessException(DataAccessException ex, WebRequest request) {
-        String message = "Database access error: " + ex.getMostSpecificCause().getMessage();
-        ErrorDetails errorDetails = new ErrorDetails(new Date(),
-                "An unexpected error occurred. Please contact support.",
-                request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ApiResponse<Object>> handleDataAccessException(DataAccessException ex, WebRequest request) {
+        log.error("Database access error: {}", ex.getMostSpecificCause().getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.builder()
+                        .timestamp(LocalDateTime.now())
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .message("An unexpected error occurred. Please contact support.")
+                        .error("Internal server error")
+                        .path(request.getDescription(false).replace("uri=", ""))
+                        .build());
     }
 
 }
