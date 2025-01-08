@@ -18,7 +18,7 @@ public class DatabaseExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse<Object>> handleDataIntegrityViolation(DataIntegrityViolationException ex, WebRequest request) {
-        log.warn("Constraint violation: {}", ex.getMostSpecificCause().getMessage());
+        log.warn("Constraint violation: {}", ex.getLocalizedMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ApiResponse.builder()
                         .timestamp(LocalDateTime.now())
@@ -31,7 +31,7 @@ public class DatabaseExceptionHandler {
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ApiResponse<Object>> handleDataAccessException(DataAccessException ex, WebRequest request) {
-        log.error("Database access error: {}", ex.getMostSpecificCause().getMessage());
+        log.error("Database access error: {}", ex.getLocalizedMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.builder()
                         .timestamp(LocalDateTime.now())
