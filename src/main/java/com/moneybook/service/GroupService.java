@@ -5,7 +5,9 @@ import com.moneybook.dto.group.GroupDto;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.mappers.GroupMapper;
 import com.moneybook.model.FriendGroup;
+import com.moneybook.model.GroupMember;
 import com.moneybook.model.NormalUser;
+import com.moneybook.repository.GroupMembershipRepo;
 import com.moneybook.repository.GroupRepo;
 import com.moneybook.repository.NormalUserRepo;
 import com.soundicly.jnanoidenhanced.jnanoid.NanoIdUtils;
@@ -19,11 +21,12 @@ public class GroupService {
 
     private GroupRepo repo;
     private NormalUserRepo normalUserRepo;
+    private GroupMembershipRepo groupMembershipRepo;
 
     @Transactional
     public GroupDto saveGroup(String userId, GroupCreateDto groupCreateDto) throws ResourceNotFoundException {
 
-        // find if existing user created the group
+        // find if the user exists
         NormalUser user = normalUserRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         FriendGroup group = GroupMapper.MAPPER.toGroup(groupCreateDto);
@@ -33,10 +36,17 @@ public class GroupService {
         group.setOwnerUsername(user.getUsername()); // Set the created_by field to the username of the user
         group.setCreated_by(user); // Set the owner of the group to the user
 
-        user.getGroups().add(group); // Add the group to the user's list of groups
+        user.getGroups().add(group); // Add the group to the user's list of created groups
 
         normalUserRepo.save(user);
         FriendGroup groupCreated = repo.saveAndFlush(group);
+//      add as a member to the group
+        GroupMember membership = GroupMember.builder()
+                .group_id(groupCreated.getGroup_id())
+                .user_id(userId)
+                .build();
+        groupMembershipRepo.save(membership);
+
         return GroupMapper.MAPPER.fromGroup(groupCreated);
     }
 
