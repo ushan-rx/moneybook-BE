@@ -8,15 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class NormalUserBriefDto {
-
-
     private String username;
-
     private String email;
-
-    private String fname;
-
-    private String lname;
-
-    private String profile_pic;
+    private String firstName;
+    private String lastName;
+    private String profilePicture;
 }

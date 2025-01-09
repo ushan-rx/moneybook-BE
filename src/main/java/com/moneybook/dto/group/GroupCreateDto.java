@@ -14,10 +14,11 @@ import lombok.*;
 public class GroupCreateDto {
     @NotBlank(message = "Group name cannot be blank")
     @Size(min = 3, max = 90, message = "Group name must be between 3 and 45 characters")
-    private String group_name;
+    private String groupName;
+
     @Pattern(
             regexp = "^[a-zA-Z0-9_ .-]+$",
             message = "Description can only contain letters, numbers, dots, underscores, and hyphens"
     )
-    private String group_description;
+    private String groupDescription;
 }

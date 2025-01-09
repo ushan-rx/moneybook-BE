@@ -13,9 +13,9 @@ public interface GroupMapper {
     GroupMapper MAPPER = Mappers.getMapper(GroupMapper.class);
 
     @Mapping(target = "ownerUsername", ignore = true)
-    @Mapping(target = "created_by", ignore = true )
-    @Mapping(target = "group_id", ignore = true)
-    @Mapping(target = "created_at", ignore = true)
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "groupId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     FriendGroup toGroup(GroupCreateDto groupCreateDto);
 
     @InheritConfiguration

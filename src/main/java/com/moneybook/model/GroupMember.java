@@ -14,16 +14,18 @@ import java.time.OffsetDateTime;
 @Builder
 @Table(name = "group_member")
 public class GroupMember {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long membership_id;
-    @Column(unique = true)
-    private String group_id;
-    @Column(unique = true)
-    private String user_id;
+    @Column(name = "membership_id")
+    private Long membershipId;
+
+    @Column(name = "group_id", unique = true)
+    private String groupId;
+
+    @Column(name = "user_id", unique = true)
+    private String userId;
 
     @CreationTimestamp
     @Column(name = "joined_at", updatable = false, nullable = false)
-    private OffsetDateTime joined_at;
+    private OffsetDateTime joinedAt;
 }

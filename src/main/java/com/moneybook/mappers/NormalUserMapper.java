@@ -13,10 +13,9 @@ import org.mapstruct.factory.Mappers;
 public interface NormalUserMapper {
 
     NormalUserMapper MAPPER = Mappers.getMapper(NormalUserMapper.class);
-
-    @Mapping(target = "user_id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "status", ignore = true)
-    @Mapping(target = "created_at", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "groups", ignore = true)
     NormalUser toNormalUser(NormalUserCreateDto dto);
 
@@ -25,6 +24,4 @@ public interface NormalUserMapper {
 
     @InheritConfiguration
     NormalUserBriefDto fromNormalUserToBrief(NormalUser user);
-
-
 }

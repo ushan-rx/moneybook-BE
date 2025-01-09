@@ -18,7 +18,7 @@ public class NormalUserService {
     @Transactional
     public NormalUserDto saveNormalUser(NormalUserCreateDto userDto) {
         NormalUser user = NormalUserMapper.MAPPER.toNormalUser(userDto);
-        user.setUser_id("2ewe8233dv833f3r83qc3f38"); //temporary
+        user.setUserId("2ewe8233dv833f3r83qc3f38"); //temporary
         NormalUser userCreated = repo.saveAndFlush(user);
         return NormalUserMapper.MAPPER.fromNormalUser(userCreated);
     }

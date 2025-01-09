@@ -11,10 +11,9 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @Builder
 public class GroupDto {
-
-    private String group_id;
-    private String group_name;
-    private String group_description;
-    private String  ownerUsername;
-    private OffsetDateTime created_at;
+    private String groupId;
+    private String groupName;
+    private String groupDescription;
+    private String ownerUsername;
+    private OffsetDateTime createdAt;
 }

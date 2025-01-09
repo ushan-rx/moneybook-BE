@@ -11,14 +11,13 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @Builder
 public class NormalUserDto {
-
-    private String user_id;
+    private String userId;
     private String username;
     private String email;
-    private String fname;
-    private String lname;
-    private String phone_no;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
     private String address;
-    private String profile_pic;
-    private OffsetDateTime created_at;
+    private String profilePicture;
+    private OffsetDateTime createdAt;
 }

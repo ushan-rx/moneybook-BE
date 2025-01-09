@@ -11,9 +11,10 @@ import org.mapstruct.factory.Mappers;
 @Mapper
 public interface GroupMemberMapper {
     GroupMemberMapper MAPPER = Mappers.getMapper(GroupMemberMapper.class);
-    @Mapping(target = "membership_id", ignore = true)
-    @Mapping(target = "joined_at", ignore = true)
-    GroupMember ToGroupMember(GroupMemberCreateDto groupMemberCreateDto);
+
+    @Mapping(target = "membershipId", ignore = true)
+    @Mapping(target = "joinedAt", ignore = true)
+    GroupMember toGroupMember(GroupMemberCreateDto groupMemberCreateDto);
 
     @InheritConfiguration
     GroupMembershipDto fromGroupMember(GroupMember groupMember);

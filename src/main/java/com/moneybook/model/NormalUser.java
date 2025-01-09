@@ -21,29 +21,34 @@ public class NormalUser {
     @Id
     @NotBlank(message = "User ID cannot be blank")
     @NotNull(message = "User ID cannot be blank!")
-    private String user_id;
+    @Column(name = "user_id")
+    private String userId;
 
     private String username;
 
     private String email;
 
-    private String fname;
+    @Column(name = "fname")
+    private String firstName;
 
-    private String lname;
+    @Column(name = "lname")
+    private String lastName;
 
-    private String phone_no;
+    @Column(name = "phone_no")
+    private String phoneNumber;
 
     private String address;
 
-    private String profile_pic;
+    @Column(name = "profile_pic")
+    private String profilePicture;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
-    private OffsetDateTime created_at;
+    private OffsetDateTime createdAt;
 
     private boolean status = true;
 
-    @OneToMany(mappedBy = "created_by",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     public List<FriendGroup> groups;
 }
 

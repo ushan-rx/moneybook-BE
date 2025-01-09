@@ -10,8 +10,8 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @Builder
 public class GroupMembershipDto {
-    private Long membership_id;
-    private String group_id;
-    private String user_id;
-    private OffsetDateTime joined_at;
+    private Long membershipId;
+    private String groupId;
+    private String userId;
+    private OffsetDateTime joinedAt;
 }

@@ -9,11 +9,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class GroupMemberCreateDto {
-
     @NotNull(message = "Group ID cannot be blank!")
-    private String group_id;
+    private String groupId;
 
     @NotNull(message = "User ID cannot be blank!")
-    private String user_id;
+    private String userId;
 
 }
