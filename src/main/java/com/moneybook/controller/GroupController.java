@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("${api.base-path}/group")
+@RequestMapping("${api.base-path}/groups")
 public class GroupController {
 
     @Autowired

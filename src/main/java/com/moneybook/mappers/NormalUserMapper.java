@@ -13,6 +13,7 @@ import org.mapstruct.factory.Mappers;
 public interface NormalUserMapper {
 
     NormalUserMapper MAPPER = Mappers.getMapper(NormalUserMapper.class);
+
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

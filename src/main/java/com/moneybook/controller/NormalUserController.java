@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("${api.base-path}/user")
+@RequestMapping("${api.base-path}/users")
 public class NormalUserController {
 
     @Autowired
