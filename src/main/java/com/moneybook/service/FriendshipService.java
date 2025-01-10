@@ -45,6 +45,7 @@ public class FriendshipService {
                 findBySenderIdAndReceiverId(friendRequestResponseDto.getReceiverId(),
                         friendRequestResponseDto.getSenderId());
         if (request != null && friendRequestResponseDto.getStatus().equals("accepted")) {
+            request.setStatus("accepted");
             FriendRequest acceptedRequest = friendRequestRepo.save(request);
             // Add to friendship table
             Friendship friendship1 = Friendship.builder()
@@ -72,6 +73,9 @@ public class FriendshipService {
         if (friendshipRepo.existsByUserIdAndFriendId(userId, friendId)) {
             friendshipRepo.deleteByUserIdAndFriendId(userId, friendId);
             friendshipRepo.deleteByUserIdAndFriendId(friendId, userId);
+            // Remove friend request if exists
+            friendRequestRepo.deleteBySenderIdAndReceiverId(userId, friendId);
+            friendRequestRepo.deleteBySenderIdAndReceiverId(friendId, userId);
             return FriendDto.builder().userId(friendId).build();
         }
         throw new IllegalArgumentException("Friend not found.");
