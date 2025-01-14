@@ -20,9 +20,9 @@ public class GroupController {
     @Autowired
     private GroupService service;
 
-    @PostMapping("/create-group/{userId}")
-    public ResponseEntity<ApiResponse<?>> createGroup(@PathVariable String userId, @Valid @RequestBody GroupCreateDto groupCreateDto) throws ResourceNotFoundException {
-        final GroupDto group = service.saveGroup(userId, groupCreateDto);
+    @PostMapping("/create-group")
+    public ResponseEntity<ApiResponse<?>> createGroup( @Valid @RequestBody GroupCreateDto groupCreateDto) throws ResourceNotFoundException {
+        final GroupDto group = service.saveGroup(groupCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.CREATED.value())

@@ -12,6 +12,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class GroupCreateDto {
+
+    @NotBlank(message = "Group name cannot be blank")
+    private String userId;
+
     @NotBlank(message = "Group name cannot be blank")
     @Size(min = 3, max = 90, message = "Group name must be between 3 and 45 characters")
     private String groupName;

@@ -24,10 +24,10 @@ public class GroupService {
     private GroupMembershipRepo groupMembershipRepo;
 
     @Transactional
-    public GroupDto saveGroup(String userId, GroupCreateDto groupCreateDto) throws ResourceNotFoundException {
+    public GroupDto saveGroup(GroupCreateDto groupCreateDto) throws ResourceNotFoundException {
 
         // find if the user exists
-        NormalUser user = normalUserRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        NormalUser user = normalUserRepo.findById(groupCreateDto.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         FriendGroup group = GroupMapper.MAPPER.toGroup(groupCreateDto);
         do {
@@ -43,7 +43,7 @@ public class GroupService {
 //      add as a member to the group
         GroupMember membership = GroupMember.builder()
                 .groupId(groupCreated.getGroupId())
-                .userId(userId)
+                .userId(groupCreateDto.getUserId())
                 .build();
 
         System.out.println("Group created: " + groupMembershipRepo.save(membership));
