@@ -30,6 +30,8 @@
         <java.version>21</java.version>
         <logback.version>1.5.15
         </logback.version> <!--to mitigate vulnerability of web and security transitive dependency -->
+<!--        for lettuce netty vulnerability-->
+        <lettuce.version>6.5.1.RELEASE</lettuce.version>
     </properties>
     <dependencies>
         <dependency>
