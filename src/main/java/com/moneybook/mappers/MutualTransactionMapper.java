@@ -12,10 +12,15 @@ import org.mapstruct.factory.Mappers;
 public interface MutualTransactionMapper {
     MutualTransactionMapper MAPPER = Mappers.getMapper(MutualTransactionMapper.class);
 
-    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "status", constant = "PENDING")
     @Mapping(target = "transactionID", ignore = true)
+    @Mapping(target = "transactionDate", expression = "java(java.time.OffsetDateTime.now())")
+    @Mapping(target = "expiryDate", expression = "java(java.time.OffsetDateTime.now().plusHours(24))") // Auto-generate expiry
+    @Mapping(target = "otpHash", ignore = true)
     MutualTransaction toMutualTransaction(MutualTransCreateDto mutualTransCreateDto);
 
+    @Mapping(target = "qrPayload", ignore = true)
+    @Mapping(target = "otp", ignore = true)
     @InheritConfiguration
     MutualTransactionDto fromMutualTransaction(MutualTransaction mutualTransaction);
 }

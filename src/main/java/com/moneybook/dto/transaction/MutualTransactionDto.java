@@ -21,4 +21,7 @@ public class MutualTransactionDto {
     private String transactionType;
     private String borrowerID;
     private String lenderID;
+    private String otp;
+    private String status;
+    private String qrPayload;
 }

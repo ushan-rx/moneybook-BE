@@ -19,6 +19,7 @@ public class PersonalTransaction {
     @Id
     @GeneratedValue
     @UuidGenerator
+    @Column(name = "transaction_id")
     private UUID transactionId;
     @Column(name = "transaction_name")
     private String transactionName;
