@@ -1,4 +1,4 @@
-package com.moneybook.util;
+package com.moneybook.dto.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -20,4 +20,6 @@ public class ApiResponse<T> {
     private String message;
     private String error; // Optional, used only when there's an error
     private String path;
+    private Pagination pagination; // Optional, used for paginated responses
 }
+

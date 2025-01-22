@@ -3,7 +3,7 @@ package com.moneybook.controller;
 import com.moneybook.dto.groupMembership.GroupMemberCreateDto;
 import com.moneybook.dto.groupMembership.GroupMembershipDto;
 import com.moneybook.service.GroupMembershipService;
-import com.moneybook.util.ApiResponse;
+import com.moneybook.dto.api.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

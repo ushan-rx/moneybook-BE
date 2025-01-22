@@ -5,10 +5,11 @@ import com.moneybook.dto.transaction.PersonalTransactionDto;
 import com.moneybook.dto.transaction.PersonalTransactionUpdateDto;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.service.PersonalTransactionService;
-import com.moneybook.util.ApiResponse;
+import com.moneybook.dto.api.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -23,77 +24,71 @@ public class PersonalTransactionController {
     private PersonalTransactionService personalTransactionService;
 
     @PostMapping("/create-transaction")
-    public ApiResponse<?> createTransaction(@Valid @RequestBody PersonalTransactionCreateDto personalTransactionCreateDto)
+    public ResponseEntity<ApiResponse<?>> createTransaction(
+            @Valid @RequestBody PersonalTransactionCreateDto personalTransactionCreateDto)
             throws ResourceNotFoundException {
         PersonalTransactionDto savedTransaction = personalTransactionService.
                 savePersonalTransaction(personalTransactionCreateDto);
 
-        return ApiResponse.builder()
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.CREATED.value())
                 .message("Transaction created successfully")
                 .data(savedTransaction)
-                .build();
+                .build());
     }
 
     @GetMapping("/{transactionId}")
-    public ApiResponse<?> getTransactionById(@PathVariable UUID transactionId) throws ResourceNotFoundException {
+    public ResponseEntity<ApiResponse<?>> getTransactionById(@PathVariable UUID transactionId)
+            throws ResourceNotFoundException {
         PersonalTransactionDto transaction = personalTransactionService.getTransactionById(transactionId);
         if (transaction == null) {
-            return ApiResponse.builder()
-                    .timestamp(LocalDateTime.now())
-                    .status(HttpStatus.NOT_FOUND.value())
-                    .message("Transaction not found")
-                    .build();
+            throw new ResourceNotFoundException("Transaction not found with ID: " + transactionId);
         }
-        return ApiResponse.builder()
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK.value())
                 .message("Transaction retrieved successfully")
                 .data(transaction)
-                .build();
+                .build());
     }
 
     @DeleteMapping("/{transactionId}")
-    public ApiResponse<?> deleteTransaction(@PathVariable UUID transactionId) throws ResourceNotFoundException {
+    public ResponseEntity<ApiResponse<?>> deleteTransaction(@PathVariable UUID transactionId) throws ResourceNotFoundException {
         PersonalTransactionDto deletedTransaction = personalTransactionService.deleteTransaction(transactionId);
-        return ApiResponse.builder()
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK.value())
                 .message("Transaction deleted successfully")
                 .data(deletedTransaction)
-                .build();
+                .build());
     }
 
     @PutMapping("/{transactionId}")
-    public ApiResponse<?> updateTransaction(@PathVariable UUID transactionId,
+    public ResponseEntity<ApiResponse<?>> updateTransaction(@PathVariable UUID transactionId,
                                             @Valid @RequestBody PersonalTransactionUpdateDto personalTransactionUpdateDto)
             throws ResourceNotFoundException {
         PersonalTransactionDto updatedTransaction = personalTransactionService
                 .updateTransaction(transactionId, personalTransactionUpdateDto);
-        return ApiResponse.builder()
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK.value())
                 .message("Transaction updated successfully")
                 .data(updatedTransaction)
-                .build();
+                .build());
     }
 
     @GetMapping("/user/{userId}")
-    public ApiResponse<?> getAllTransactionsByUserId(@PathVariable String userId) throws ResourceNotFoundException {
+    public ResponseEntity<ApiResponse<?>> getAllTransactionsByUserId(@PathVariable String userId) throws ResourceNotFoundException {
         List<PersonalTransactionDto> transactions = personalTransactionService.getAllTransactionsByUserId(userId);
         if (transactions.isEmpty()) {
-            return ApiResponse.builder()
-                    .timestamp(LocalDateTime.now())
-                    .status(HttpStatus.NOT_FOUND.value())
-                    .message("No transactions found")
-                    .build();
+            throw new ResourceNotFoundException("No transactions found for user with ID: " + userId);
         }
-        return ApiResponse.builder()
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK.value())
                 .message("Transactions retrieved successfully")
                 .data(transactions)
-                .build();
+                .build());
     }
 }

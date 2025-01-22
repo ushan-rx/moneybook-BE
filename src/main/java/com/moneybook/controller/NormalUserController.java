@@ -4,7 +4,7 @@ package com.moneybook.controller;
 import com.moneybook.dto.user.NormalUserCreateDto;
 import com.moneybook.dto.user.NormalUserDto;
 import com.moneybook.service.NormalUserService;
-import com.moneybook.util.ApiResponse;
+import com.moneybook.dto.api.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

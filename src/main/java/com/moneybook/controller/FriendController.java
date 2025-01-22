@@ -2,7 +2,7 @@ package com.moneybook.controller;
 
 import com.moneybook.dto.friend.*;
 import com.moneybook.service.FriendshipService;
-import com.moneybook.util.ApiResponse;
+import com.moneybook.dto.api.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,7 +52,7 @@ public class FriendController {
                 .build());
     }
 
-    @GetMapping("/getFriends/{userId}")
+    @GetMapping("/{userId}/friendList")
     public ResponseEntity<ApiResponse<?>> getFriends(@PathVariable String userId) {
         List<FriendDto> friends = friendshipService.getFriends(userId);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()

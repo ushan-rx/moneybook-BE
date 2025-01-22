@@ -1,6 +1,6 @@
 package com.moneybook.exception;
 
-import com.moneybook.util.ApiResponse;
+import com.moneybook.dto.api.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;

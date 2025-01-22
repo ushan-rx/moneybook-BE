@@ -1,6 +1,6 @@
 package com.moneybook.exception;
 
-import com.moneybook.util.ApiResponse;
+import com.moneybook.dto.api.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -31,7 +31,7 @@ public class DatabaseExceptionHandler {
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<ApiResponse<Object>> handleDataAccessException(DataAccessException ex, WebRequest request) {
-        log.error("Database access error: {}", ex.getLocalizedMessage());
+        log.error("Database access error: {}", ex.getLocalizedMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.builder()
                         .timestamp(LocalDateTime.now())
