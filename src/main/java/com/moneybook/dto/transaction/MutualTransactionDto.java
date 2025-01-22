@@ -23,5 +23,7 @@ public class MutualTransactionDto {
     private String lenderID;
     private String otp;
     private String status;
-    private String qrPayload;
+    private QrPayload qrPayload;
 }
+
+

@@ -30,6 +30,10 @@ public class PersonalTransactionService {
 
         PersonalTransaction transaction = PersonalTransactionMapper.MAPPER
                 .toPersonalTransaction(personalTransactionCreateDto);
+
+        // generate transactionId
+        transaction.setTransactionId(UUID.randomUUID());
+
         PersonalTransaction savedTransaction = personalTransactionRepo.saveAndFlush(transaction);
         return PersonalTransactionMapper.MAPPER.fromPersonalTransaction(savedTransaction);
     }

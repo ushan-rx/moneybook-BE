@@ -3,9 +3,7 @@ package com.moneybook.model;
 import com.moneybook.model.enums.TransactionStatus;
 import com.moneybook.model.enums.TransactionType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -15,12 +13,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @Entity
 @Table(name = "mutual_transaction")
 public class MutualTransaction {
     @Id
-    @GeneratedValue
-    @UuidGenerator
     @Column(name = "transaction_id")
     private UUID transactionID;
 

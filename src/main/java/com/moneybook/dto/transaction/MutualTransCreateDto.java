@@ -24,7 +24,7 @@ public class MutualTransCreateDto {
     private BigDecimal amount;
 
     @NotNull(message = "Transaction type cannot be null")
-    @Pattern(regexp = "^(Loan|Borrow)$", message = "Transaction type must be either Loan or Borrow")
+    @Pattern(regexp = "^(LOAN|BORROW)$", message = "Transaction type must be either Loan or Borrow")
     private String transactionType;
 
     @NotNull(message = "Borrower ID cannot be null")
