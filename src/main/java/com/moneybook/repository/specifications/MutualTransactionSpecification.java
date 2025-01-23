@@ -32,21 +32,7 @@ public class MutualTransactionSpecification {
             }
 
             // Loop through filters and build predicates
-            for (Map.Entry<String, String> filter : filters.entrySet()) {
-                String key = filter.getKey();
-                String value = filter.getValue();
-
-                // Handle OffsetDateTime fields (transactionDateFrom, transactionDateTo)
-                if (key.equals("dateFrom") || key.equals("dateTo")) {
-                    predicate = criteriaBuilder.and(predicate,
-                            util.buildDatePredicate(key, value, "transactionDate", criteriaBuilder, root));
-                }
-                // Handle other string fields (e.g., transactionType)
-                else {
-                    predicate = criteriaBuilder.and(predicate,
-                            util.buildStringPredicate(key, value, criteriaBuilder, root));
-                }
-            }
+            predicate = util.generateFilters(filters, predicate, criteriaBuilder, root);
             return predicate;
         };
     }
