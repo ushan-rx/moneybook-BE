@@ -139,7 +139,7 @@ public class MutualTransactionController {
             MutualTransactionFilter filterRequest,
             Pageable pageable) {
         Map<String, String> filters = ApiUtil.getFilters(filterRequest); // generate filters
-        Page<MutualTransactionDto> response = mutualTransactionService.getUserTransactions(userID, status, filters, pageable);
+        Page<MutualTransactionDto> response = mutualTransactionService.getMutualTransactions(userID, status, filters, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.builder()

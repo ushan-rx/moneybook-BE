@@ -5,14 +5,12 @@ import com.moneybook.model.enums.TransactionStatus;
 import com.moneybook.repository.specifications.util.SpecificationUtil;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Component
-@Slf4j
 @AllArgsConstructor
 public class MutualTransactionSpecification {
 

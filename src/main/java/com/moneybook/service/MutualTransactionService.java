@@ -111,7 +111,7 @@ public class MutualTransactionService {
         return mapToDto(transaction);
     }
 
-    public Page<MutualTransactionDto> getUserTransactions(
+    public Page<MutualTransactionDto> getMutualTransactions(
             String userID, TransactionStatus status, Map<String, String> filters, Pageable pageable) {
         Specification<MutualTransaction> specifications = specification.buildSpecification(userID, status, filters);
         return repo.findAll(specifications, pageable).map(MutualTransactionMapper.MAPPER::fromMutualTransaction);
