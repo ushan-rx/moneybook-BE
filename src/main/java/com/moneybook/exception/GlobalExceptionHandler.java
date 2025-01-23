@@ -91,7 +91,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message(ex.getMessage())
+                .message("Internal server error")
                 .error("Internal server error")
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build());
