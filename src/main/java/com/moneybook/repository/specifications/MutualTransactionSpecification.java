@@ -16,6 +16,7 @@ public class MutualTransactionSpecification {
     public Specification<MutualTransaction> buildSpecification(String userID, TransactionStatus status,
                                                                Map<String, String> filters) {
         return (root, query, criteriaBuilder) -> {
+            // Build predicate for borrowerID or lenderID
             Predicate predicate = criteriaBuilder.or(
                     criteriaBuilder.equal(root.get("borrowerID"), userID),
                     criteriaBuilder.equal(root.get("lenderID"), userID)
@@ -30,26 +31,24 @@ public class MutualTransactionSpecification {
                 String key = filter.getKey();
                 String value = filter.getValue();
 
-                    // Handle OffsetDateTime fields (transactionDateFrom, transactionDateTo)
-                    if (key.equals("transactionDateFrom") || key.equals("transactionDateTo")) {
-                            OffsetDateTime dateValue = OffsetDateTime.parse(value);
+                // Handle OffsetDateTime fields (transactionDateFrom, transactionDateTo)
+                if (key.equals("dateFrom") || key.equals("dateTo")) {
+                    OffsetDateTime dateValue = OffsetDateTime.parse(value);
 
-                            if (key.equals("transactionDateFrom")) {
-                                predicate = criteriaBuilder.and(predicate,
-                                        criteriaBuilder.greaterThanOrEqualTo(root.get("transactionDate"), dateValue));
-                            } else {
-                                predicate = criteriaBuilder.and(predicate,
-                                        criteriaBuilder.lessThanOrEqualTo(root.get("transactionDate"), dateValue));
-                            }
-                    }
-                    // Handle other string fields (e.g., transactionType)
-                    else {
+                    if (key.equals("dateFrom")) {
                         predicate = criteriaBuilder.and(predicate,
-                                criteriaBuilder.like(root.get(key), "%" + value + "%"));
+                                criteriaBuilder.greaterThanOrEqualTo(root.get("transactionDate"), dateValue));
+                    } else {
+                        predicate = criteriaBuilder.and(predicate,
+                                criteriaBuilder.lessThanOrEqualTo(root.get("transactionDate"), dateValue));
                     }
-
+                }
+                // Handle other string fields (e.g., transactionType)
+                else {
+                    predicate = criteriaBuilder.and(predicate,
+                            criteriaBuilder.like(root.get(key), "%" + value + "%"));
+                }
             }
-
             return predicate;
         };
     }

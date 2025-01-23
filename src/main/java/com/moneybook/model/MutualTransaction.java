@@ -3,8 +3,10 @@ package com.moneybook.model;
 import com.moneybook.model.enums.TransactionStatus;
 import com.moneybook.model.enums.TransactionType;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;

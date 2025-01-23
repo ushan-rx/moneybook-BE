@@ -2,9 +2,7 @@ package com.moneybook.controller;
 
 
 import com.moneybook.dto.api.ApiResponse;
-import com.moneybook.dto.transaction.MutualTransCreateDto;
-import com.moneybook.dto.transaction.MutualTransactionDto;
-import com.moneybook.dto.transaction.MutualTransactionFilter;
+import com.moneybook.dto.transaction.*;
 import com.moneybook.exception.InvalidOtpException;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.exception.UserMismatchException;
@@ -32,78 +30,125 @@ public class MutualTransactionController {
 
     // Create a new transaction
     @PostMapping("/create")
-    public ResponseEntity<MutualTransactionDto> createTransaction(
+    public ResponseEntity<ApiResponse<MutualTransactionDto>> createTransaction(
             @Valid @RequestBody MutualTransCreateDto dto) {
         MutualTransactionDto response = mutualTransactionService.createTransaction(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.<MutualTransactionDto>builder()
+                        .status(HttpStatus.CREATED.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("Transaction created successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
     // Validate QR data
     @GetMapping("/validate-qr")
-    public ResponseEntity<MutualTransactionDto> validateQrData(
+    public ResponseEntity<ApiResponse<MutualTransactionDto>> validateQrData(
             @RequestParam UUID transactionID,
             @RequestParam String hashedOtp,
             @RequestParam String userID) throws UserMismatchException, InvalidOtpException, ResourceNotFoundException {
         MutualTransactionDto response = mutualTransactionService.validateQrData(transactionID, hashedOtp, userID);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.<MutualTransactionDto>builder()
+                        .status(HttpStatus.OK.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("QR data validated successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
     // Accept transaction using OTP
     @PostMapping("/{transactionID}/accept/manual")
-    public ResponseEntity<MutualTransactionDto> acceptTransactionManual(
+    public ResponseEntity<ApiResponse<MutualTransactionDto>> acceptTransactionManual(
             @PathVariable UUID transactionID,
-            @RequestParam String otp,
-            @RequestParam String userID) throws UserMismatchException, InvalidOtpException, ResourceNotFoundException {
-        MutualTransactionDto response = mutualTransactionService.acceptTransactionManual(transactionID, otp, userID);
-        return ResponseEntity.ok(response);
+            @Valid @RequestBody MutualTransactionManual manualData)
+            throws UserMismatchException, InvalidOtpException, ResourceNotFoundException {
+        MutualTransactionDto response = mutualTransactionService.acceptTransactionManual(transactionID, manualData);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.<MutualTransactionDto>builder()
+                        .status(HttpStatus.OK.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("Transaction accepted successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
     // Accept transaction using QR code (hashed OTP)
     @PostMapping("/{transactionID}/accept/qr")
-    public ResponseEntity<MutualTransactionDto> acceptTransactionQr(
+    public ResponseEntity<ApiResponse<MutualTransactionDto>> acceptTransactionQr(
             @PathVariable UUID transactionID,
-            @RequestParam String hashedOtp,
-            @RequestParam String userID) throws UserMismatchException, InvalidOtpException, ResourceNotFoundException {
-        MutualTransactionDto response = mutualTransactionService.acceptTransactionQr(transactionID, hashedOtp, userID);
-        return ResponseEntity.ok(response);
+            @Valid @RequestBody MutualTransactionQr qrData)
+            throws UserMismatchException, InvalidOtpException, ResourceNotFoundException {
+        MutualTransactionDto response = mutualTransactionService.acceptTransactionQr(transactionID, qrData);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.<MutualTransactionDto>builder()
+                        .status(HttpStatus.OK.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("Transaction accepted successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
     // Reject transaction
     @PostMapping("/{transactionID}/reject")
-    public ResponseEntity<MutualTransactionDto> rejectTransaction(
+    public ResponseEntity<ApiResponse<MutualTransactionDto>> rejectTransaction(
             @PathVariable UUID transactionID,
-            @RequestParam String userID) throws ResourceNotFoundException {
+            @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
+        String userID = requestBody.get("userID");
+        if (userID == null) {
+            throw new IllegalArgumentException("User ID is required");
+        }
         MutualTransactionDto response = mutualTransactionService.rejectTransaction(transactionID, userID);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.<MutualTransactionDto>builder()
+                        .status(HttpStatus.OK.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("Transaction rejected successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
     // Cancel transaction
     @PostMapping("/{transactionID}/cancel")
-    public ResponseEntity<MutualTransactionDto> cancelTransaction(
+    public ResponseEntity<ApiResponse<MutualTransactionDto>> cancelTransaction(
             @PathVariable UUID transactionID,
-            @RequestParam String userID) throws ResourceNotFoundException {
+            @RequestBody Map<String, String> RequestData) throws ResourceNotFoundException {
+        String userID = RequestData.get("userID");
         MutualTransactionDto response = mutualTransactionService.cancelTransaction(transactionID, userID);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.<MutualTransactionDto>builder()
+                        .status(HttpStatus.OK.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("Transaction cancelled successfully")
+                        .data(response)
+                        .build()
+        );
     }
 
-    // Get user transactions with optional status filtering
-@GetMapping("/{userID}/transactions")
-public ResponseEntity<ApiResponse<?>> getUserTransactions(
-        @PathVariable String userID,
-        @RequestParam(required = false) TransactionStatus status,
-        MutualTransactionFilter filterRequest,
-        Pageable pageable) {
-    Map<String, String> filters = ApiUtil.getFilters(filterRequest); // generate filters
-    Page<MutualTransactionDto> response = mutualTransactionService.getUserTransactions(userID, status, filters, pageable);
+    // Get user transactions with optional status & filtering
+    @GetMapping("/{userID}/transactions")
+    public ResponseEntity<ApiResponse<?>> getUserTransactions(
+            @PathVariable String userID,
+            @RequestParam(required = false) TransactionStatus status,
+            MutualTransactionFilter filterRequest,
+            Pageable pageable) {
+        Map<String, String> filters = ApiUtil.getFilters(filterRequest); // generate filters
+        Page<MutualTransactionDto> response = mutualTransactionService.getUserTransactions(userID, status, filters, pageable);
 
-    return ResponseEntity.status(HttpStatus.OK).body(
-            ApiResponse.builder()
-                    .status(HttpStatus.OK.value())
-                    .timestamp(LocalDateTime.now())
-                    .message("Transactions retrieved successfully")
-                    .data(response.getContent()) // Send only the content
-                    .pagination(ApiUtil.getPagination(response)) // Send pagination details
-                    .build()
-    );
-}
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.builder()
+                        .status(HttpStatus.OK.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("Transactions retrieved successfully")
+                        .data(response.getContent()) // Send only the content
+                        .pagination(ApiUtil.getPagination(response)) // Send pagination details
+                        .build()
+        );
+    }
 }

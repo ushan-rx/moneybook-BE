@@ -1,8 +1,6 @@
 package com.moneybook.service;
 
-import com.moneybook.dto.transaction.MutualTransCreateDto;
-import com.moneybook.dto.transaction.MutualTransactionDto;
-import com.moneybook.dto.transaction.QrPayload;
+import com.moneybook.dto.transaction.*;
 import com.moneybook.exception.InvalidOtpException;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.exception.UserMismatchException;
@@ -75,7 +73,6 @@ public class MutualTransactionService {
         return response;
     }
 
-    //
     public MutualTransactionDto validateQrData(UUID transactionID, String hashedOtp, String userID)
             throws ResourceNotFoundException, UserMismatchException, InvalidOtpException {
         MutualTransaction transaction = repo.findById(transactionID)
@@ -97,21 +94,32 @@ public class MutualTransactionService {
     }
 
     @Transactional
-    public MutualTransactionDto acceptTransactionManual(UUID transactionID, String otp, String userID)
+    public MutualTransactionDto acceptTransactionManual(UUID transactionID, MutualTransactionManual manualData)
             throws UserMismatchException, ResourceNotFoundException, InvalidOtpException {
-        String hashedOtp = OtpUtil.hashOtp(otp);
-        return acceptTransaction(transactionID, hashedOtp, userID);
+        // Validate OTP
+        String storedOtpHash = redisTemplate.opsForValue().get("transaction:" + transactionID);
+        if(!OtpUtil.verifyOtp(manualData.getOtp(), storedOtpHash)){
+            throw new InvalidOtpException("Invalid or expired OTP");
+        }
+        return acceptTransaction(transactionID, manualData.getUserID());
     }
 
     @Transactional
-    public MutualTransactionDto acceptTransactionQr(UUID transactionID, String hashedOtp, String userID)
+    public MutualTransactionDto acceptTransactionQr(UUID transactionID, MutualTransactionQr qrData)
             throws UserMismatchException, ResourceNotFoundException, InvalidOtpException {
-        return acceptTransaction(transactionID, hashedOtp, userID);
+        // Validate OTP hash
+        String storedOtpHash = redisTemplate.opsForValue().get("transaction:" + transactionID);
+        System.out.println(storedOtpHash);
+        if (!storedOtpHash.equals(qrData.getHashedOtp())) {
+            log.warn("Invalid or expired OTP for transaction ID: {}", transactionID);
+            throw new InvalidOtpException("Invalid or expired OTP");
+        }
+        return acceptTransaction(transactionID, qrData.getUserID());
     }
 
     @Transactional
-    public MutualTransactionDto acceptTransaction(UUID transactionID,  String hashedOtp, String userID)
-            throws ResourceNotFoundException, UserMismatchException, InvalidOtpException {
+    public MutualTransactionDto acceptTransaction(UUID transactionID, String userID)
+            throws ResourceNotFoundException, UserMismatchException{
         log.info("Starting transaction acceptance for ID: {}", transactionID);
 
         // Fetch the transaction
@@ -124,12 +132,8 @@ public class MutualTransactionService {
             throw new UserMismatchException("Unauthorized action for user with ID: " + userID);
         }
 
-        // Validate OTP
-        String storedOtpHash = redisTemplate.opsForValue().get("transaction:" + transactionID);
-        if (storedOtpHash == null || !storedOtpHash.equals(hashedOtp)) {
-            log.warn("Invalid or expired OTP for transaction ID: {}", transactionID);
-            throw new IllegalArgumentException("Invalid or expired OTP");
-        }
+        //remove otp from redis
+        redisTemplate.delete("transaction:" + transactionID);
 
         // Mark as ACCEPTED
         transaction.setStatus(TransactionStatus.ACCEPTED);
@@ -152,6 +156,10 @@ public class MutualTransactionService {
         // Verify borrower identity
         if (!transaction.getBorrowerID().equals(userID)) {
             throw new IllegalArgumentException("Unauthorized action for user with ID: " + userID);
+        }
+        //verify if accepted
+        if(transaction.getStatus().equals(TransactionStatus.ACCEPTED)){
+            throw new IllegalArgumentException("Transaction already accepted");
         }
 
         // Mark as REJECTED
@@ -191,11 +199,6 @@ public class MutualTransactionService {
         return transactions.map(MutualTransactionMapper.MAPPER::fromMutualTransaction);
     }
 
-
-
-
-
-
     @Scheduled(cron = "0 30 23 * * *") // Runs every day at 11:30 PM
     @Transactional
     public void checkTransactionExpiry() {
@@ -203,6 +206,5 @@ public class MutualTransactionService {
                 TransactionStatus.CANCELLED, TransactionStatus.PENDING, OffsetDateTime.now());
         log.info("{} transactions expired and were marked as CANCELLED", updatedCount);
     }
-
 
 }
