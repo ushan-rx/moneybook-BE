@@ -98,7 +98,7 @@ public class MutualTransactionController {
     @PostMapping("/{transactionID}/reject")
     public ResponseEntity<ApiResponse<MutualTransactionDto>> rejectTransaction(
             @PathVariable UUID transactionID,
-            @RequestBody Map<String, String> requestBody) throws ResourceNotFoundException {
+            @RequestBody Map<String, String> requestBody) throws UserMismatchException, ResourceNotFoundException {
         String userID = requestBody.get("userID");
         if (userID == null) {
             throw new IllegalArgumentException("User ID is required");
@@ -118,7 +118,7 @@ public class MutualTransactionController {
     @PostMapping("/{transactionID}/cancel")
     public ResponseEntity<ApiResponse<MutualTransactionDto>> cancelTransaction(
             @PathVariable UUID transactionID,
-            @RequestBody Map<String, String> RequestData) throws ResourceNotFoundException {
+            @RequestBody Map<String, String> RequestData) throws UserMismatchException, ResourceNotFoundException {
         String userID = RequestData.get("userID");
         MutualTransactionDto response = mutualTransactionService.cancelTransaction(transactionID, userID);
         return ResponseEntity.status(HttpStatus.OK).body(

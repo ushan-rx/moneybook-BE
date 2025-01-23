@@ -31,175 +31,93 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MutualTransactionService {
 
-    private MutualTransactionRepo repo;
-    private MutualTransactionSpecification specification;
-    RedisTemplate<String, String> redisTemplate;
+    private final MutualTransactionRepo repo;
+    private final MutualTransactionSpecification specification;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     public MutualTransactionDto createTransaction(MutualTransCreateDto dto) {
-        // Generate and hash OTP0
         String otp = OtpUtil.generateOtp();
         String otpHash = OtpUtil.hashOtp(otp);
 
         MutualTransaction transaction = MutualTransactionMapper.MAPPER.toMutualTransaction(dto);
+        // Set the otp and transaction ID
         transaction.setOtpHash(otpHash);
-
-        // generate transactionId
         transaction.setTransactionID(UUID.randomUUID());
 
-        // Save to database
         MutualTransaction savedTransaction = repo.save(transaction);
-
-        // Store OTP in Redis with TTL (24 hours)
-        redisTemplate.opsForValue().set(
-                "transaction:" + transaction.getTransactionID(),
-                otpHash,
-                Duration.ofHours(24)
-        );
-
-//         Generate QR payload
+        storeOtpInRedis(savedTransaction.getTransactionID(), otpHash);
+        // Create the QR payload
         QrPayload qrPayload = QrPayload.builder()
                 .transactionID(savedTransaction.getTransactionID())
                 .otpHash(otpHash)
                 .build();
 
-        // Notify borrower
-//        notificationService.notifyBorrower(transaction.getBorrowerID(), transaction);
+        MutualTransactionDto response = mapToDto(savedTransaction);
+        response.setOtp(otp);
+        response.setQrPayload(qrPayload);
 
-        // Return transaction details + OTP + QR payload
-        MutualTransactionDto response = MutualTransactionMapper.MAPPER.fromMutualTransaction(savedTransaction);
-        response.setOtp(otp); // Send raw OTP for QR payload
-        response.setQrPayload(qrPayload); // Include QR payload
         return response;
     }
 
     public MutualTransactionDto validateQrData(UUID transactionID, String hashedOtp, String userID)
-            throws ResourceNotFoundException, UserMismatchException, InvalidOtpException {
-        MutualTransaction transaction = repo.findById(transactionID)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with ID: " + transactionID));
-
-        // Check if user matches
-        if (!transaction.getBorrowerID().equals(userID)) {
-            throw new UserMismatchException("Unauthorized user with ID: " + userID);
-        }
-
-        // Validate OTP hash in Redis
-        String storedOtpHash = redisTemplate.opsForValue().get("transaction:" + transactionID);
-        if (storedOtpHash == null || !storedOtpHash.equals(hashedOtp)) {
-            throw new InvalidOtpException("Invalid or expired OTP");
-        }
-
-        // Return transaction details
-        return MutualTransactionMapper.MAPPER.fromMutualTransaction(transaction);
+            throws InvalidOtpException, UserMismatchException, ResourceNotFoundException {
+        MutualTransaction transaction = fetchAndValidateTransaction(transactionID, userID);
+        validateOtpInRedis(transactionID, hashedOtp);
+        return mapToDto(transaction);
     }
 
     @Transactional
     public MutualTransactionDto acceptTransactionManual(UUID transactionID, MutualTransactionManual manualData)
-            throws UserMismatchException, ResourceNotFoundException, InvalidOtpException {
-        // Validate OTP
-        String storedOtpHash = redisTemplate.opsForValue().get("transaction:" + transactionID);
-        if(!OtpUtil.verifyOtp(manualData.getOtp(), storedOtpHash)){
-            throw new InvalidOtpException("Invalid or expired OTP");
-        }
-        return acceptTransaction(transactionID, manualData.getUserID());
+            throws UserMismatchException, InvalidOtpException, ResourceNotFoundException {
+        validateOtp(transactionID, manualData.getOtp());
+        return updateTransactionStatus(transactionID, manualData.getUserID(), TransactionStatus.ACCEPTED);
     }
 
     @Transactional
     public MutualTransactionDto acceptTransactionQr(UUID transactionID, MutualTransactionQr qrData)
-            throws UserMismatchException, ResourceNotFoundException, InvalidOtpException {
-        // Validate OTP hash
-        String storedOtpHash = redisTemplate.opsForValue().get("transaction:" + transactionID);
-        System.out.println(storedOtpHash);
-        if (!storedOtpHash.equals(qrData.getHashedOtp())) {
-            log.warn("Invalid or expired OTP for transaction ID: {}", transactionID);
-            throw new InvalidOtpException("Invalid or expired OTP");
-        }
-        return acceptTransaction(transactionID, qrData.getUserID());
+            throws UserMismatchException, InvalidOtpException, ResourceNotFoundException {
+        validateOtpInRedis(transactionID, qrData.getHashedOtp());
+        return updateTransactionStatus(transactionID, qrData.getUserID(), TransactionStatus.ACCEPTED);
     }
 
+    // reject transaction by borrower
     @Transactional
-    public MutualTransactionDto acceptTransaction(UUID transactionID, String userID)
-            throws ResourceNotFoundException, UserMismatchException{
-        log.info("Starting transaction acceptance for ID: {}", transactionID);
+    public MutualTransactionDto rejectTransaction(UUID transactionID, String userID)
+            throws UserMismatchException, ResourceNotFoundException {
+        return updateTransactionStatus(transactionID, userID, TransactionStatus.REJECTED);
+    }
 
-        // Fetch the transaction
+    // cancel transaction by lender
+    @Transactional
+    public MutualTransactionDto cancelTransaction(UUID transactionID, String userID)
+            throws UserMismatchException, ResourceNotFoundException {
         MutualTransaction transaction = repo.findById(transactionID)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with ID: " + transactionID));
 
-        // Verify user identity
-        if (!transaction.getBorrowerID().equals(userID)) {
-            log.warn("Unauthorized action by user ID: {}", userID);
-            throw new UserMismatchException("Unauthorized action for user with ID: " + userID);
+        if (!transaction.getLenderID().equals(userID)) {
+            throw new UserMismatchException("Unauthorized user with ID: " + userID);
         }
 
-        //remove otp from redis
-        redisTemplate.delete("transaction:" + transactionID);
-
-        // Mark as ACCEPTED
-        transaction.setStatus(TransactionStatus.ACCEPTED);
-        repo.save(transaction);
-        log.info("Transaction ID {} marked as ACCEPTED by user ID {}", transactionID, userID);
-
-        // Notify lender asynchronously (if enabled)
-        // notificationService.notifyLenderAsync(transaction.getLenderID(), transaction);
-
-        // Return transaction details
-        return MutualTransactionMapper.MAPPER.fromMutualTransaction(transaction);
-    }
-
-
-    @Transactional
-    public MutualTransactionDto rejectTransaction(UUID transactionID, String userID) throws ResourceNotFoundException {
-        MutualTransaction transaction = repo.findById(transactionID)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with ID: " + transactionID));
-
-        // Verify borrower identity
-        if (!transaction.getBorrowerID().equals(userID)) {
-            throw new IllegalArgumentException("Unauthorized action for user with ID: " + userID);
-        }
-        //verify if accepted
-        if(transaction.getStatus().equals(TransactionStatus.ACCEPTED)){
+        if (transaction.getStatus() == TransactionStatus.ACCEPTED) {
             throw new IllegalArgumentException("Transaction already accepted");
         }
 
-        // Mark as REJECTED
-        transaction.setStatus(TransactionStatus.REJECTED);
-        repo.save(transaction);
-
-        // Notify lender
-//        notificationService.notifyLender(transaction.getLenderID(), transaction);
-
-        return MutualTransactionMapper.MAPPER.fromMutualTransaction(transaction);
-    }
-
-    @Transactional
-    public MutualTransactionDto cancelTransaction(UUID transactionID, String userID) throws ResourceNotFoundException {
-        MutualTransaction transaction = repo.findById(transactionID)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with ID: " + transactionID));
-
-        // Verify user identity
-        if (!transaction.getLenderID().equals(userID)) {
-            throw new IllegalArgumentException("Unauthorized action for user with ID: " + userID);
-        }
-
-        // Mark as CANCELLED
+        redisTemplate.delete("transaction:" + transactionID);
         transaction.setStatus(TransactionStatus.CANCELLED);
         repo.save(transaction);
+        log.info("Transaction ID {} marked as {} by user ID {}", transactionID, TransactionStatus.CANCELLED, userID);
 
-        // Notify borrower
-//        notificationService.notifyBorrower(transaction.getBorrowerID(), transaction);
-
-        return MutualTransactionMapper.MAPPER.fromMutualTransaction(transaction);
+        return mapToDto(transaction);
     }
 
     public Page<MutualTransactionDto> getUserTransactions(
             String userID, TransactionStatus status, Map<String, String> filters, Pageable pageable) {
         Specification<MutualTransaction> specifications = specification.buildSpecification(userID, status, filters);
-        Page<MutualTransaction> transactions = repo.findAll(specifications, pageable);
-        return transactions.map(MutualTransactionMapper.MAPPER::fromMutualTransaction);
+        return repo.findAll(specifications, pageable).map(MutualTransactionMapper.MAPPER::fromMutualTransaction);
     }
 
-    @Scheduled(cron = "0 30 23 * * *") // Runs every day at 11:30 PM
+    @Scheduled(cron = "0 30 23 * * *")
     @Transactional
     public void checkTransactionExpiry() {
         int updatedCount = repo.batchUpdateExpiredTransactions(
@@ -207,4 +125,58 @@ public class MutualTransactionService {
         log.info("{} transactions expired and were marked as CANCELLED", updatedCount);
     }
 
+
+    // Helper methods
+    private void storeOtpInRedis(UUID transactionID, String otpHash) {
+        redisTemplate.opsForValue().set(
+                "transaction:" + transactionID,
+                otpHash,
+                Duration.ofHours(24)
+        );
+    }
+
+    private void validateOtpInRedis(UUID transactionID, String providedOtpHash) throws InvalidOtpException {
+        String storedOtpHash = redisTemplate.opsForValue().get("transaction:" + transactionID);
+        if (storedOtpHash == null || !storedOtpHash.equals(providedOtpHash)) {
+            throw new InvalidOtpException("Invalid or expired OTP");
+        }
+    }
+
+    private void validateOtp(UUID transactionID, String otp) throws InvalidOtpException {
+        String storedOtpHash = redisTemplate.opsForValue().get("transaction:" + transactionID);
+        if (!OtpUtil.verifyOtp(otp, storedOtpHash)) {
+            throw new InvalidOtpException("Invalid or expired OTP");
+        }
+    }
+
+    private MutualTransaction fetchAndValidateTransaction(UUID transactionID, String userID)
+            throws UserMismatchException, ResourceNotFoundException {
+        MutualTransaction transaction = repo.findById(transactionID)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with ID: " + transactionID));
+
+        if (!transaction.getBorrowerID().equals(userID)) {
+            throw new UserMismatchException("Unauthorized user with ID: " + userID);
+        }
+        return transaction;
+    }
+
+    private MutualTransactionDto updateTransactionStatus(UUID transactionID, String userID, TransactionStatus status)
+            throws UserMismatchException, ResourceNotFoundException {
+        MutualTransaction transaction = fetchAndValidateTransaction(transactionID, userID);
+
+        if (transaction.getStatus() == TransactionStatus.ACCEPTED) {
+            throw new IllegalArgumentException("Transaction already accepted");
+        }
+
+        redisTemplate.delete("transaction:" + transactionID);
+        transaction.setStatus(status);
+        repo.save(transaction);
+        log.info("Transaction ID {} marked as {} by user ID {}", transactionID, status, userID);
+
+        return mapToDto(transaction);
+    }
+
+    private MutualTransactionDto mapToDto(MutualTransaction transaction) {
+        return MutualTransactionMapper.MAPPER.fromMutualTransaction(transaction);
+    }
 }
