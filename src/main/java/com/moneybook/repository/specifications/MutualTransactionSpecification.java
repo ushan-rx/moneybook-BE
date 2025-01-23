@@ -2,17 +2,22 @@ package com.moneybook.repository.specifications;
 
 import com.moneybook.model.MutualTransaction;
 import com.moneybook.model.enums.TransactionStatus;
+import com.moneybook.repository.specifications.util.SpecificationUtil;
 import jakarta.persistence.criteria.Predicate;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
-import java.time.OffsetDateTime;
 import java.util.Map;
 
 @Component
 @Slf4j
+@AllArgsConstructor
 public class MutualTransactionSpecification {
+
+    private SpecificationUtil util;
+
     public Specification<MutualTransaction> buildSpecification(String userID, TransactionStatus status,
                                                                Map<String, String> filters) {
         return (root, query, criteriaBuilder) -> {
@@ -33,23 +38,22 @@ public class MutualTransactionSpecification {
 
                 // Handle OffsetDateTime fields (transactionDateFrom, transactionDateTo)
                 if (key.equals("dateFrom") || key.equals("dateTo")) {
-                    OffsetDateTime dateValue = OffsetDateTime.parse(value);
-
-                    if (key.equals("dateFrom")) {
-                        predicate = criteriaBuilder.and(predicate,
-                                criteriaBuilder.greaterThanOrEqualTo(root.get("transactionDate"), dateValue));
-                    } else {
-                        predicate = criteriaBuilder.and(predicate,
-                                criteriaBuilder.lessThanOrEqualTo(root.get("transactionDate"), dateValue));
-                    }
+                    predicate = criteriaBuilder.and(predicate,
+                            util.buildDatePredicate(key, value, "transactionDate", criteriaBuilder, root));
                 }
                 // Handle other string fields (e.g., transactionType)
                 else {
                     predicate = criteriaBuilder.and(predicate,
-                            criteriaBuilder.like(root.get(key), "%" + value + "%"));
+                            util.buildStringPredicate(key, value, criteriaBuilder, root));
                 }
             }
             return predicate;
         };
     }
+
+
+
+
+
+
 }
