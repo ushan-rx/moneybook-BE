@@ -15,12 +15,14 @@ public interface PersonalTransactionMapper {
     PersonalTransactionMapper MAPPER = Mappers.getMapper(PersonalTransactionMapper.class);
 
     @Mapping(target = "transactionId", ignore = true)
+    @Mapping(target = "category", source = "category")
     PersonalTransaction toPersonalTransaction(PersonalTransactionCreateDto personalTransactionCreateDto);
 
     @InheritConfiguration
     PersonalTransactionDto fromPersonalTransaction(PersonalTransaction personalTransaction);
 
 
+    @Mapping(target = "userId", ignore = true)
     @Mapping(target = "transactionId", ignore = true)
     void updatePersonalTransactionFromDto(PersonalTransactionUpdateDto personalTransactionUpdateDto, @MappingTarget PersonalTransaction existingTransaction);
 }

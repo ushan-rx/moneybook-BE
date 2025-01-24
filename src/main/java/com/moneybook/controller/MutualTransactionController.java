@@ -30,7 +30,7 @@ public class MutualTransactionController {
 
     // Create a new transaction
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<MutualTransactionDto>> createTransaction(
+    public ResponseEntity<ApiResponse<MutualTransactionDto>> saveTransaction(
             @Valid @RequestBody MutualTransCreateDto dto) {
         MutualTransactionDto response = mutualTransactionService.createTransaction(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(

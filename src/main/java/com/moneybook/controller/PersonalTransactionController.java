@@ -2,18 +2,22 @@ package com.moneybook.controller;
 
 import com.moneybook.dto.transaction.PersonalTransactionCreateDto;
 import com.moneybook.dto.transaction.PersonalTransactionDto;
+import com.moneybook.dto.transaction.PersonalTransactionFilter;
 import com.moneybook.dto.transaction.PersonalTransactionUpdateDto;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.service.PersonalTransactionService;
 import com.moneybook.dto.api.ApiResponse;
+import com.moneybook.util.ApiUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +27,7 @@ public class PersonalTransactionController {
     @Autowired
     private PersonalTransactionService personalTransactionService;
 
-    @PostMapping("/create-transaction")
+    @PostMapping("/create")
     public ResponseEntity<ApiResponse<?>> createTransaction(
             @Valid @RequestBody PersonalTransactionCreateDto personalTransactionCreateDto)
             throws ResourceNotFoundException {
@@ -78,17 +82,20 @@ public class PersonalTransactionController {
                 .build());
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<?>> getAllTransactionsByUserId(@PathVariable String userId) throws ResourceNotFoundException {
-        List<PersonalTransactionDto> transactions = personalTransactionService.getAllTransactionsByUserId(userId);
-        if (transactions.isEmpty()) {
-            throw new ResourceNotFoundException("No transactions found for user with ID: " + userId);
-        }
+    @GetMapping("/{userId}/transactions")
+    public ResponseEntity<ApiResponse<?>> getAllTransactionsByUserId(
+            @PathVariable String userId,
+            @Valid PersonalTransactionFilter filterRequest,
+            Pageable pageable) throws ResourceNotFoundException {
+        Map<String, String> filters = ApiUtil.getFilters(filterRequest);
+        Page<PersonalTransactionDto> response = personalTransactionService.getAllTransactionsByUserId(userId, filters, pageable);
+
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.OK.value())
                 .message("Transactions retrieved successfully")
-                .data(transactions)
+                .data(response.getContent())
+                .pagination(ApiUtil.getPagination(response))
                 .build());
     }
 }

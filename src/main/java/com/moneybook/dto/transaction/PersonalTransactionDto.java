@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -18,7 +19,7 @@ public class PersonalTransactionDto {
     private String transactionType;
     private String category;
     private String description;
-    private String transactionDate;
+    private OffsetDateTime transactionDate;
     @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal transactionAmount;
     private String userId;

@@ -6,12 +6,14 @@ import jakarta.persistence.criteria.Root;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 
 @Component
 public class SpecificationUtil {
 
-    public <T> Predicate generateFilters(Map<String, String> filters, Predicate predicate, CriteriaBuilder criteriaBuilder, Root<T> root){
+    public <T> Predicate generateFilters(Map<String, String> filters, Predicate predicate,
+                                         CriteriaBuilder criteriaBuilder, Root<T> root) {
         // Loop through filters and build predicates
         for (Map.Entry<String, String> filter : filters.entrySet()) {
             String key = filter.getKey();
@@ -21,6 +23,7 @@ public class SpecificationUtil {
             if (key.equals("dateFrom") || key.equals("dateTo")) {
                 predicate = criteriaBuilder.and(predicate,
                         buildDatePredicate(key, value, "transactionDate", criteriaBuilder, root));
+
             }
             // Handle other string fields
             else {
@@ -31,23 +34,29 @@ public class SpecificationUtil {
         return predicate;
     }
 
-    public <T> Predicate buildDatePredicate(String key, String value, String dateField, CriteriaBuilder criteriaBuilder, Root<T> root) {
+    public <T> Predicate buildDatePredicate(String key, String value, String dateField,
+                                            CriteriaBuilder criteriaBuilder, Root<T> root) {
+        OffsetDateTime dateValue;
         // Handle OffsetDateTime fields
         if (key.equals("dateFrom") || key.equals("dateTo")) {
-            OffsetDateTime dateValue = OffsetDateTime.parse(value);
+            try {
+                dateValue = OffsetDateTime.parse(value);
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Invalid date format for : " + key);
+            }
             if (key.equals("dateFrom")) {
                 return criteriaBuilder.greaterThanOrEqualTo(root.get(dateField), dateValue);
             } else {
                 return criteriaBuilder.lessThanOrEqualTo(root.get(dateField), dateValue);
             }
-        }else {
+        } else {
             throw new IllegalArgumentException("Invalid date field: " + key);
         }
     }
 
-    public <T> Predicate buildStringPredicate(String key, String value, CriteriaBuilder criteriaBuilder, Root<T> root){
+    public <T> Predicate buildStringPredicate(String key, String value,
+                                              CriteriaBuilder criteriaBuilder, Root<T> root) {
         return criteriaBuilder.like(root.get(key), "%" + value + "%");
 
     }
-
-    }
+}
