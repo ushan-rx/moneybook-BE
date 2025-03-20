@@ -1,4 +1,4 @@
-package com.moneybook.service;
+package com.moneybook.service.group;
 
 import com.moneybook.dto.groupMembership.GroupMemberCreateDto;
 import com.moneybook.dto.groupMembership.GroupMembershipDto;

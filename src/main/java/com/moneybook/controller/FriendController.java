@@ -1,7 +1,7 @@
 package com.moneybook.controller;
 
 import com.moneybook.dto.friend.*;
-import com.moneybook.service.FriendshipService;
+import com.moneybook.service.friend.FriendshipService;
 import com.moneybook.dto.api.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

@@ -3,7 +3,7 @@ package com.moneybook.controller;
 import com.moneybook.dto.group.GroupCreateDto;
 import com.moneybook.dto.group.GroupDto;
 import com.moneybook.exception.ResourceNotFoundException;
-import com.moneybook.service.GroupService;
+import com.moneybook.service.group.GroupService;
 import com.moneybook.dto.api.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.moneybook.service;
+package com.moneybook.service.friend;
 
 import com.moneybook.dto.friend.*;
 import com.moneybook.mappers.FriendRequestMapper;

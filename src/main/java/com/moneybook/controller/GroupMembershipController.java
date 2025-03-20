@@ -2,7 +2,7 @@ package com.moneybook.controller;
 
 import com.moneybook.dto.groupMembership.GroupMemberCreateDto;
 import com.moneybook.dto.groupMembership.GroupMembershipDto;
-import com.moneybook.service.GroupMembershipService;
+import com.moneybook.service.group.GroupMembershipService;
 import com.moneybook.dto.api.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,4 +30,6 @@ public class GroupMembershipController {
                 .data(addedMember)
                 .build());
     }
+
+
 }

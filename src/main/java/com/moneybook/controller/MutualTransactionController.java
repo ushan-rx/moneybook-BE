@@ -7,7 +7,7 @@ import com.moneybook.exception.InvalidOtpException;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.exception.UserMismatchException;
 import com.moneybook.model.enums.TransactionStatus;
-import com.moneybook.service.MutualTransactionService;
+import com.moneybook.service.transaction.MutualTransactionService;
 import com.moneybook.util.ApiUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

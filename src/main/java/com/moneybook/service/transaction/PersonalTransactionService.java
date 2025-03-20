@@ -1,4 +1,4 @@
-package com.moneybook.service;
+package com.moneybook.service.transaction;
 
 import com.moneybook.dto.transaction.PersonalTransactionCreateDto;
 import com.moneybook.dto.transaction.PersonalTransactionDto;

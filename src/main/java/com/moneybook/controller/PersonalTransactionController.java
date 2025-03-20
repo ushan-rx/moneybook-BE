@@ -5,7 +5,7 @@ import com.moneybook.dto.transaction.PersonalTransactionDto;
 import com.moneybook.dto.transaction.PersonalTransactionFilter;
 import com.moneybook.dto.transaction.PersonalTransactionUpdateDto;
 import com.moneybook.exception.ResourceNotFoundException;
-import com.moneybook.service.PersonalTransactionService;
+import com.moneybook.service.transaction.PersonalTransactionService;
 import com.moneybook.dto.api.ApiResponse;
 import com.moneybook.util.ApiUtil;
 import jakarta.validation.Valid;
