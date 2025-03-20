@@ -1,4 +1,4 @@
-package com.moneybook.repository.specifications.util;
+package com.moneybook.repository.specifications.helper;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;

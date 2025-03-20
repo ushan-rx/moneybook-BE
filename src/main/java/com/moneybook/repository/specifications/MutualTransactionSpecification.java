@@ -2,7 +2,7 @@ package com.moneybook.repository.specifications;
 
 import com.moneybook.model.MutualTransaction;
 import com.moneybook.model.enums.TransactionStatus;
-import com.moneybook.repository.specifications.util.SpecificationUtil;
+import com.moneybook.repository.specifications.helper.SpecificationUtil;
 import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,6 +14,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class MutualTransactionSpecification {
 
+    // include helper methods to generate filters for the specification
     private SpecificationUtil util;
 
     public Specification<MutualTransaction> buildSpecification(String userID, TransactionStatus status,

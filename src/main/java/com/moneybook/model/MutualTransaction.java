@@ -26,6 +26,9 @@ public class MutualTransaction {
     @Column(name = "transaction_name", nullable = false)
     private String transactionName;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
