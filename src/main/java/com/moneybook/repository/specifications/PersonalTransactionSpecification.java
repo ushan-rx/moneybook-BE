@@ -1,7 +1,7 @@
 package com.moneybook.repository.specifications;
 
 import com.moneybook.model.PersonalTransaction;
-import com.moneybook.repository.specifications.util.SpecificationUtil;
+import com.moneybook.repository.specifications.helper.SpecificationUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;

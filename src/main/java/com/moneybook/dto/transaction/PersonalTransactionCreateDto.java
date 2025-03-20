@@ -3,6 +3,7 @@ package com.moneybook.dto.transaction;
 import com.moneybook.model.TransactionCategory;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -30,6 +31,7 @@ public class PersonalTransactionCreateDto {
             message = "Category must be a valid category")
     private String category;
 
+    @Max(value = 100, message = "Description must be less than 100 characters")
     private String description;
 
     @NotNull(message = "Transaction date cannot be null")
