@@ -2,6 +2,8 @@ package com.moneybook.service;
 
 import com.moneybook.dto.user.NormalUserCreateDto;
 import com.moneybook.dto.user.NormalUserDto;
+import com.moneybook.dto.user.NormalUserUpdateDto;
+import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.mappers.NormalUserMapper;
 import com.moneybook.model.NormalUser;
 import com.moneybook.repository.NormalUserRepo;
@@ -23,9 +25,22 @@ public class NormalUserService {
         return NormalUserMapper.MAPPER.fromNormalUser(userCreated);
     }
 
-    public boolean isNewUser(String subId) {
-        return !repo.existsById(subId);
+    @Transactional
+    public NormalUserDto updateNormalUser(String userID, NormalUserUpdateDto dto) throws ResourceNotFoundException {
+        NormalUser existingUser = repo.findById(userID)
+                .orElseThrow(()-> new ResourceNotFoundException(("User with id " + userID + " not found")));
+
+        NormalUserMapper.MAPPER.FromUpdateUserToNormalUser(dto, existingUser);
+        NormalUser updatedUser = repo.save(existingUser);
+        return NormalUserMapper.MAPPER.fromNormalUser(updatedUser);
     }
 
-    //add check username service
+    public boolean isNewUser(String subId) {
+        NormalUser user = repo.findById(subId).orElse(null);
+        if(user == null) {
+            return true;
+        } else if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty() || user.getPhoneNumber().isBlank()) {
+            return true;
+        } else return user.getAddress() == null || user.getAddress().isEmpty() || user.getAddress().isBlank();
+    }
 }
