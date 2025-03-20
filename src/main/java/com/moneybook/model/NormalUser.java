@@ -24,8 +24,6 @@ public class NormalUser {
     @Column(name = "user_id")
     private String userId;
 
-    private String username;
-
     private String email;
 
     @Column(name = "fname")

@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 public interface GroupMapper {
     GroupMapper MAPPER = Mappers.getMapper(GroupMapper.class);
 
-    @Mapping(target = "ownerUsername", ignore = true)
+    @Mapping(target = "ownerName", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "groupId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

@@ -18,6 +18,10 @@ public class GroupCreateDto {
 
     @NotBlank(message = "Group name cannot be blank")
     @Size(min = 3, max = 90, message = "Group name must be between 3 and 45 characters")
+    @Pattern(
+            regexp = "^[a-zA-Z0-9_ -]+$",
+            message = "Group name can only contain letters, numbers, space, underscores, and hyphens"
+    )
     private String groupName;
 
     @Pattern(

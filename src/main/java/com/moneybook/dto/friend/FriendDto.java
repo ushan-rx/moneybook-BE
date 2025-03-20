@@ -12,5 +12,6 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class FriendDto {
     private String userId;
-    private String username;
+    private String firstName;
+    private String lastName;
 }

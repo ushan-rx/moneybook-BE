@@ -12,7 +12,6 @@ import java.time.OffsetDateTime;
 @Builder
 public class NormalUserDto {
     private String userId;
-    private String username;
     private String email;
     private String firstName;
     private String lastName;

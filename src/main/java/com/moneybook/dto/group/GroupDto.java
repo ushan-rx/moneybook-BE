@@ -14,6 +14,6 @@ public class GroupDto {
     private String groupId;
     private String groupName;
     private String groupDescription;
-    private String ownerUsername;
+    private String ownerName;
     private OffsetDateTime createdAt;
 }

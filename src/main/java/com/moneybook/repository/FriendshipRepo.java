@@ -13,7 +13,7 @@ import java.util.List;
 public interface FriendshipRepo extends JpaRepository<Friendship, Long> {
     void deleteByUserIdAndFriendId(String userId, String friendId); // For deleting a friend
 
-    @Query("SELECT new com.moneybook.dto.friend.FriendDto(u.userId, u.username) " +
+    @Query("SELECT new com.moneybook.dto.friend.FriendDto(u.userId, u.firstName, u.lastName) " +
             "FROM Friendship f " +
             "JOIN NormalUser u ON f.friendId = u.userId " +
             "WHERE f.userId = :userId")

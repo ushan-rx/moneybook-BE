@@ -25,7 +25,8 @@ public class FriendGroup {
     @Column(name = "group_description")
     private String groupDescription;
 
-    private String ownerUsername;
+    @Column(name = "owner_name")
+    private String ownerName;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
