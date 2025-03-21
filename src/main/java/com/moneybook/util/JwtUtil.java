@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +12,7 @@ import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
@@ -62,12 +64,23 @@ public class JwtUtil {
         Cookie refreshCookie = new Cookie("refresh-token", refreshToken);
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
-        refreshCookie.setPath("/");
+        refreshCookie.setPath("api/v1/auth/refresh");
         refreshCookie.setMaxAge((int) (REFRESH_TOKEN_EXPIRY / 1000));
         refreshCookie.setAttribute("SameSite", "Strict");
 
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
+    }
+
+    public static void setAccessTokenCookie(HttpServletResponse response, String accessToken) {
+        Cookie accessCookie = new Cookie("auth-token", accessToken);
+        accessCookie.setHttpOnly(true);
+        accessCookie.setSecure(true); // Ensures cookie is only sent over HTTPS
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge((int) (ACCESS_TOKEN_EXPIRY / 1000));
+        accessCookie.setAttribute("SameSite", "Strict");
+
+        response.addCookie(accessCookie);
     }
 
     public static void clearCookies(HttpServletResponse response) {
@@ -93,6 +106,7 @@ public class JwtUtil {
                     .parseSignedClaims(token);
             return true;
         }catch (Exception e){
+            log.error("Error parsing token: {}", e.getMessage());
             return false;
         }
     }

@@ -28,12 +28,12 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Disable session creation
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/public/**", "/oauth2/**").permitAll()
+                        .requestMatchers("/api/v1/public/**", "/oauth2/**", "/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2SuccessHandler))
                 .logout(logout -> logout
-                        .logoutUrl("/api/logout")
+                        .logoutUrl("/api/v1/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             JwtUtil.clearCookies(response);
                             response.sendRedirect("http://localhost:3000/");
