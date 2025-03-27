@@ -3,9 +3,9 @@ package com.moneybook.dto.transaction;
 import com.moneybook.model.TransactionCategory;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -31,12 +31,10 @@ public class PersonalTransactionCreateDto {
             message = "Category must be a valid category")
     private String category;
 
-    @Max(value = 100, message = "Description must be less than 100 characters")
+    @Size(max = 150, message = "Description must be less than 100 characters")
     private String description;
 
     @NotNull(message = "Transaction date cannot be null")
-    @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})(?:\\[.*])?)$",
-            message = "Transaction date must be in ISO 8601 format")
     private OffsetDateTime transactionDate;
 
     @NotNull(message = "Transaction amount cannot be null")
