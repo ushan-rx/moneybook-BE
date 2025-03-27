@@ -6,11 +6,9 @@ import com.moneybook.model.GroupMember;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface GroupMemberMapper {
-    GroupMemberMapper MAPPER = Mappers.getMapper(GroupMemberMapper.class);
 
     @Mapping(target = "membershipId", ignore = true)
     @Mapping(target = "joinedAt", ignore = true)

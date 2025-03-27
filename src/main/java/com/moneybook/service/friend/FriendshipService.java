@@ -19,6 +19,7 @@ public class FriendshipService {
 
     private FriendshipRepo friendshipRepo;
     private FriendRequestRepo friendRequestRepo;
+    private final FriendRequestMapper requestMapper;
 
     @Transactional
     public FriendRequestDto sendFriendRequest(FriendRequestCreateDto friendRequestCreateDto) {
@@ -33,10 +34,10 @@ public class FriendshipService {
                 friendRequestRepo.existsBySenderIdAndReceiverId(receiverId, senderId)) {
             throw new IllegalArgumentException("A friend request is already pending between the users.");
         }
-        FriendRequest request = FriendRequestMapper.MAPPER.toFriendRequest(friendRequestCreateDto);
+        FriendRequest request = requestMapper.toFriendRequest(friendRequestCreateDto);
         request.setStatus("pending");
         FriendRequest savedRequest = friendRequestRepo.save(request);
-        return FriendRequestMapper.MAPPER.fromFriendRequest(savedRequest);
+        return requestMapper.fromFriendRequest(savedRequest);
     }
 
     @Transactional
@@ -58,10 +59,10 @@ public class FriendshipService {
                     .build();
             friendshipRepo.saveAll(Arrays.asList(friendship1, friendship2));
 
-            return FriendRequestMapper.MAPPER.fromFriendRequest(acceptedRequest);
+            return requestMapper.fromFriendRequest(acceptedRequest);
         } else if (request != null && friendRequestResponseDto.getStatus().equals("rejected")) {
             friendRequestRepo.delete(request);
-            return FriendRequestMapper.MAPPER.fromFriendRequest(request);
+            return requestMapper.fromFriendRequest(request);
         }
         throw new IllegalArgumentException("Friend request not found.");
     }

@@ -6,11 +6,9 @@ import com.moneybook.model.MutualTransaction;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MutualTransactionMapper {
-    MutualTransactionMapper MAPPER = Mappers.getMapper(MutualTransactionMapper.class);
 
     @Mapping(target = "status", constant = "PENDING")
     @Mapping(target = "transactionID", ignore = true)

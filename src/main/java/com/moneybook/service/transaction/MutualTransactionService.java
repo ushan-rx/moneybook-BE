@@ -34,13 +34,14 @@ public class MutualTransactionService {
     private final MutualTransactionRepo repo;
     private final MutualTransactionSpecification specification;
     private final RedisTemplate<String, String> redisTemplate;
+    private final MutualTransactionMapper mapper;
 
     @Transactional
     public MutualTransactionDto createTransaction(MutualTransCreateDto dto) {
         String otp = OtpUtil.generateOtp();
         String otpHash = OtpUtil.hashOtp(otp);
 
-        MutualTransaction transaction = MutualTransactionMapper.MAPPER.toMutualTransaction(dto);
+        MutualTransaction transaction = mapper.toMutualTransaction(dto);
         // Set the otp and transaction ID
         transaction.setOtpHash(otpHash);
         transaction.setTransactionID(UUID.randomUUID());
@@ -114,7 +115,7 @@ public class MutualTransactionService {
     public Page<MutualTransactionDto> getMutualTransactions(
             String userID, TransactionStatus status, Map<String, String> filters, Pageable pageable) {
         Specification<MutualTransaction> specifications = specification.buildSpecification(userID, status, filters);
-        return repo.findAll(specifications, pageable).map(MutualTransactionMapper.MAPPER::fromMutualTransaction);
+        return repo.findAll(specifications, pageable).map(mapper::fromMutualTransaction);
     }
 
     @Scheduled(cron = "0 30 23 * * *")
@@ -177,6 +178,6 @@ public class MutualTransactionService {
     }
 
     private MutualTransactionDto mapToDto(MutualTransaction transaction) {
-        return MutualTransactionMapper.MAPPER.fromMutualTransaction(transaction);
+        return mapper.fromMutualTransaction(transaction);
     }
 }

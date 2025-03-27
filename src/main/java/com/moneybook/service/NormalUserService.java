@@ -16,13 +16,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class NormalUserService {
 
-    private NormalUserRepo repo;
+    private final NormalUserRepo repo;
+    private final NormalUserMapper mapper;
 
     @Transactional
     public NormalUserDto saveNormalUser(@Valid NormalUserCreateDto userDto) {
-        NormalUser user = NormalUserMapper.MAPPER.FromCreateUsertoNormalUser(userDto);
+        NormalUser user = mapper.FromCreateUsertoNormalUser(userDto);
         NormalUser userCreated = repo.saveAndFlush(user);
-        return NormalUserMapper.MAPPER.fromNormalUser(userCreated);
+        return mapper.fromNormalUser(userCreated);
     }
 
     @Transactional
@@ -30,9 +31,9 @@ public class NormalUserService {
         NormalUser existingUser = repo.findById(userID)
                 .orElseThrow(()-> new ResourceNotFoundException(("User with id " + userID + " not found")));
 
-        NormalUserMapper.MAPPER.FromUpdateUserToNormalUser(dto, existingUser);
+        mapper.FromUpdateUserToNormalUser(dto, existingUser);
         NormalUser updatedUser = repo.save(existingUser);
-        return NormalUserMapper.MAPPER.fromNormalUser(updatedUser);
+        return mapper.fromNormalUser(updatedUser);
     }
 
     public boolean isNewUser(String subId) {

@@ -9,12 +9,9 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface NormalUserMapper {
-
-    NormalUserMapper MAPPER = Mappers.getMapper(NormalUserMapper.class);
 
     @Mapping(target = "phoneNumber", ignore = true)
     @Mapping(target = "lastName", ignore = true)

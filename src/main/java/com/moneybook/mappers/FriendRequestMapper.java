@@ -6,11 +6,9 @@ import com.moneybook.model.FriendRequest;
 import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface FriendRequestMapper {
-    FriendRequestMapper MAPPER = Mappers.getMapper(FriendRequestMapper.class);
 
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "status", ignore = true)

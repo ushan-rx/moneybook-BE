@@ -23,9 +23,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PersonalTransactionService {
 
-    private PersonalTransactionRepo repo;
-    private PersonalTransactionSpecification specification;
-    private NormalUserRepo normalUserRepo;
+    private final PersonalTransactionRepo repo;
+    private final PersonalTransactionSpecification specification;
+    private final NormalUserRepo normalUserRepo;
+    private final PersonalTransactionMapper mapper;
 
     @Transactional
     public PersonalTransactionDto savePersonalTransaction(PersonalTransactionCreateDto personalTransactionCreateDto)
@@ -33,21 +34,21 @@ public class PersonalTransactionService {
         String userId = personalTransactionCreateDto.getUserId();
         normalUserRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
 
-        PersonalTransaction transaction = PersonalTransactionMapper.MAPPER
+        PersonalTransaction transaction = mapper
                 .toPersonalTransaction(personalTransactionCreateDto);
 
         // generate transactionId
         transaction.setTransactionId(UUID.randomUUID());
 
         PersonalTransaction savedTransaction = repo.saveAndFlush(transaction);
-        return PersonalTransactionMapper.MAPPER.fromPersonalTransaction(savedTransaction);
+        return mapper.fromPersonalTransaction(savedTransaction);
     }
 
     @Transactional
     public PersonalTransactionDto getTransactionById(UUID transactionId) throws ResourceNotFoundException {
         PersonalTransaction transaction = repo.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction with id " + transactionId + " not found"));
-        return PersonalTransactionMapper.MAPPER.fromPersonalTransaction(transaction);
+        return mapper.fromPersonalTransaction(transaction);
     }
 
     @Transactional
@@ -55,7 +56,7 @@ public class PersonalTransactionService {
         PersonalTransaction transaction = repo.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction with id " + transactionId + " not found"));
         repo.delete(transaction);
-        return PersonalTransactionMapper.MAPPER.fromPersonalTransaction(transaction);
+        return mapper.fromPersonalTransaction(transaction);
     }
 
     @Transactional
@@ -65,9 +66,9 @@ public class PersonalTransactionService {
 
         PersonalTransaction existingTransaction = repo.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction with id " + transactionId + " not found"));
-        PersonalTransactionMapper.MAPPER.updatePersonalTransactionFromDto(updateDto, existingTransaction);
+        mapper.updatePersonalTransactionFromDto(updateDto, existingTransaction);
         PersonalTransaction updatedTransaction = repo.save(existingTransaction);
-        return PersonalTransactionMapper.MAPPER.fromPersonalTransaction(updatedTransaction);
+        return mapper.fromPersonalTransaction(updatedTransaction);
     }
 
     @Transactional
@@ -79,7 +80,7 @@ public class PersonalTransactionService {
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
         Specification<PersonalTransaction> specifications;
         specifications = specification.buildSpecification(userId, filters);
-        return repo.findAll(specifications, pageable).map(PersonalTransactionMapper.MAPPER::fromPersonalTransaction);
+        return repo.findAll(specifications, pageable).map(mapper::fromPersonalTransaction);
     }
 
 }

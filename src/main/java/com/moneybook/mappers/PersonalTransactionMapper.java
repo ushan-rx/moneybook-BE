@@ -8,12 +8,9 @@ import org.mapstruct.InheritConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PersonalTransactionMapper {
-    PersonalTransactionMapper MAPPER = Mappers.getMapper(PersonalTransactionMapper.class);
-
     @Mapping(target = "transactionId", ignore = true)
     @Mapping(target = "category", source = "category")
     PersonalTransaction toPersonalTransaction(PersonalTransactionCreateDto personalTransactionCreateDto);

@@ -13,13 +13,14 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class GroupMembershipService {
 
-    private GroupMembershipRepo repo;
+    private final GroupMembershipRepo repo;
+    private final GroupMemberMapper mapper;
 
     @Transactional
     public GroupMembershipDto addGroupMember(GroupMemberCreateDto groupMemberCreateDto) {
-        GroupMember membership = GroupMemberMapper.MAPPER.toGroupMember(groupMemberCreateDto);
+        GroupMember membership = mapper.toGroupMember(groupMemberCreateDto);
         // Add the group member to the group
         GroupMember membershipCreated = repo.saveAndFlush(membership);
-        return GroupMemberMapper.MAPPER.fromGroupMember(membershipCreated);
+        return mapper.fromGroupMember(membershipCreated);
     }
 }
