@@ -8,7 +8,7 @@ import com.moneybook.mappers.PersonalTransactionMapper;
 import com.moneybook.model.PersonalTransaction;
 import com.moneybook.repository.NormalUserRepo;
 import com.moneybook.repository.PersonalTransactionRepo;
-import com.moneybook.repository.specifications.PersonalTransactionSpecification;
+import com.moneybook.util.FilterSpecification;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +24,6 @@ import java.util.UUID;
 public class PersonalTransactionService {
 
     private final PersonalTransactionRepo repo;
-    private final PersonalTransactionSpecification specification;
     private final NormalUserRepo normalUserRepo;
     private final PersonalTransactionMapper mapper;
 
@@ -78,8 +77,9 @@ public class PersonalTransactionService {
             Pageable pageable) throws ResourceNotFoundException {
         normalUserRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
-        Specification<PersonalTransaction> specifications;
-        specifications = specification.buildSpecification(userId, filters);
+        filters.put("userId", userId); //
+        Specification<PersonalTransaction> specifications = new FilterSpecification<>(filters);
+
         return repo.findAll(specifications, pageable).map(mapper::fromPersonalTransaction);
     }
 

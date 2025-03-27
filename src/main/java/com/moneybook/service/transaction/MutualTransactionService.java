@@ -8,7 +8,7 @@ import com.moneybook.mappers.MutualTransactionMapper;
 import com.moneybook.model.MutualTransaction;
 import com.moneybook.model.enums.TransactionStatus;
 import com.moneybook.repository.MutualTransactionRepo;
-import com.moneybook.repository.specifications.MutualTransactionSpecification;
+import com.moneybook.util.FilterSpecification;
 import com.moneybook.util.OtpUtil;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,6 @@ import java.util.UUID;
 public class MutualTransactionService {
 
     private final MutualTransactionRepo repo;
-    private final MutualTransactionSpecification specification;
     private final RedisTemplate<String, String> redisTemplate;
     private final MutualTransactionMapper mapper;
 
@@ -113,8 +112,13 @@ public class MutualTransactionService {
     }
 
     public Page<MutualTransactionDto> getMutualTransactions(
-            String userID, TransactionStatus status, Map<String, String> filters, Pageable pageable) {
-        Specification<MutualTransaction> specifications = specification.buildSpecification(userID, status, filters);
+            String userID,
+            Map<String, String> filters,
+            Pageable pageable) {
+//        Specification<MutualTransaction> specifications = specification.buildSpecification(userID, status, filters);
+        Specification<MutualTransaction> specifications = new FilterSpecification<>(filters);
+
+        specifications = specifications.and(((root, query, cb) ->  cb.or(cb.equal(root.get("borrowerID"), userID), cb.equal(root.get("lenderID"), userID))));
         return repo.findAll(specifications, pageable).map(mapper::fromMutualTransaction);
     }
 

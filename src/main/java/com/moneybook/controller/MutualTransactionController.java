@@ -3,10 +3,10 @@ package com.moneybook.controller;
 
 import com.moneybook.dto.api.ApiResponse;
 import com.moneybook.dto.transaction.*;
+import com.moneybook.dto.transaction.filters.MutualTransactionFilter;
 import com.moneybook.exception.InvalidOtpException;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.exception.UserMismatchException;
-import com.moneybook.model.enums.TransactionStatus;
 import com.moneybook.service.transaction.MutualTransactionService;
 import com.moneybook.util.ApiUtil;
 import jakarta.validation.Valid;
@@ -135,11 +135,10 @@ public class MutualTransactionController {
     @GetMapping("/{userID}/transactions")
     public ResponseEntity<ApiResponse<?>> getUserTransactions(
             @PathVariable String userID,
-            @RequestParam(required = false) TransactionStatus status,
-            MutualTransactionFilter filterRequest,
+            @Valid @ModelAttribute MutualTransactionFilter filterRequest,
             Pageable pageable) {
         Map<String, String> filters = ApiUtil.getFilters(filterRequest); // generate filters
-        Page<MutualTransactionDto> response = mutualTransactionService.getMutualTransactions(userID, status, filters, pageable);
+        Page<MutualTransactionDto> response = mutualTransactionService.getMutualTransactions(userID,  filters, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.builder()

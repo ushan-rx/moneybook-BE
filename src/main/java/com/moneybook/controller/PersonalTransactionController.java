@@ -2,7 +2,7 @@ package com.moneybook.controller;
 
 import com.moneybook.dto.transaction.PersonalTransactionCreateDto;
 import com.moneybook.dto.transaction.PersonalTransactionDto;
-import com.moneybook.dto.transaction.PersonalTransactionFilter;
+import com.moneybook.dto.transaction.filters.PersonalTransactionFilter;
 import com.moneybook.dto.transaction.PersonalTransactionUpdateDto;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.service.transaction.PersonalTransactionService;
@@ -85,7 +85,7 @@ public class PersonalTransactionController {
     @GetMapping("/{userId}/transactions")
     public ResponseEntity<ApiResponse<?>> getAllTransactionsByUserId(
             @PathVariable String userId,
-            @Valid PersonalTransactionFilter filterRequest,
+            @Valid @ModelAttribute PersonalTransactionFilter filterRequest,
             Pageable pageable) throws ResourceNotFoundException {
         Map<String, String> filters = ApiUtil.getFilters(filterRequest);
         Page<PersonalTransactionDto> response = personalTransactionService.getAllTransactionsByUserId(userId, filters, pageable);
