@@ -6,6 +6,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -56,15 +57,15 @@ public class JwtUtil {
     public static void setJwtCookies(HttpServletResponse response, String accessToken, String refreshToken) {
         Cookie accessCookie = new Cookie("auth-token", accessToken);
         accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true); // Ensures cookie is only sent over HTTPS
+//        accessCookie.setSecure(true); // Ensures cookie is only sent over HTTPS
         accessCookie.setPath("/");
         accessCookie.setMaxAge((int) (ACCESS_TOKEN_EXPIRY / 1000));
         accessCookie.setAttribute("SameSite", "Strict");
 
         Cookie refreshCookie = new Cookie("refresh-token", refreshToken);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("api/v1/auth/refresh");
+//        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/");
         refreshCookie.setMaxAge((int) (REFRESH_TOKEN_EXPIRY / 1000));
         refreshCookie.setAttribute("SameSite", "Strict");
 
@@ -75,7 +76,7 @@ public class JwtUtil {
     public static void setAccessTokenCookie(HttpServletResponse response, String accessToken) {
         Cookie accessCookie = new Cookie("auth-token", accessToken);
         accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true); // Ensures cookie is only sent over HTTPS
+//        accessCookie.setSecure(true); // Ensures cookie is only sent over HTTPS
         accessCookie.setPath("/");
         accessCookie.setMaxAge((int) (ACCESS_TOKEN_EXPIRY / 1000));
         accessCookie.setAttribute("SameSite", "Strict");
@@ -98,12 +99,25 @@ public class JwtUtil {
         response.addCookie(refreshCookie);
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateAccessToken(String accessToken) {
         try {
             Jwts.parser()
                     .verifyWith(getAccessSecret()) // verify signature
                     .build()
-                    .parseSignedClaims(token);
+                    .parseSignedClaims(accessToken);
+            return true;
+        }catch (Exception e){
+            log.error("Error parsing token: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean validateRefreshToken(String refreshToken) {
+        try {
+            Jwts.parser()
+                    .verifyWith(getRefreshSecret()) // verify signature
+                    .build()
+                    .parseSignedClaims(refreshToken);
             return true;
         }catch (Exception e){
             log.error("Error parsing token: {}", e.getMessage());
@@ -119,4 +133,15 @@ public class JwtUtil {
                 .getPayload()
                 .getSubject();  // get userId from payload
     }
+
+    public String extractUserIdFromRefreshToken(String token){
+        return Jwts.parser()
+                .verifyWith(getRefreshSecret())
+                .build()
+                .parseSignedClaims(token) // parse token
+                .getPayload()
+                .getSubject();  // get userId from payload
+    }
+
+
 }

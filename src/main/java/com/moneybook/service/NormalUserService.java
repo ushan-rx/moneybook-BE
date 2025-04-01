@@ -1,5 +1,6 @@
 package com.moneybook.service;
 
+import com.moneybook.dto.user.NormalUserBriefDto;
 import com.moneybook.dto.user.NormalUserCreateDto;
 import com.moneybook.dto.user.NormalUserDto;
 import com.moneybook.dto.user.NormalUserUpdateDto;
@@ -43,5 +44,11 @@ public class NormalUserService {
         } else if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty() || user.getPhoneNumber().isBlank()) {
             return true;
         } else return user.getAddress() == null || user.getAddress().isEmpty() || user.getAddress().isBlank();
+    }
+
+    public NormalUserBriefDto getUserBrief(String userId) throws ResourceNotFoundException {
+        NormalUser user = repo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+        return mapper.fromNormalUserToBrief(user);
     }
 }

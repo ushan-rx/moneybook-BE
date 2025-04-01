@@ -30,7 +30,7 @@ public class NormalUserUpdateDto {
     @NotBlank(message = "Address cannot be blank")
     private String address;
 
-    private boolean status;
+    private boolean status = true;
 
 //    @URL(protocol = "https")
 //    private String profilePicture;

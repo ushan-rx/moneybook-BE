@@ -26,6 +26,7 @@ public interface NormalUserMapper {
     NormalUserDto fromNormalUser(NormalUser normalUser);
 
     @InheritConfiguration
+    @Mapping(target = "userId", source = "userId")
     NormalUserBriefDto fromNormalUserToBrief(NormalUser user);
 
     @Mapping(target = "userId", ignore = true)

@@ -22,16 +22,16 @@ public class NormalUserController {
     @Autowired
     private NormalUserService userService;
 
-    @PostMapping("/create-user")
-    public ResponseEntity<ApiResponse<?>> createUser(@Valid @RequestBody NormalUserCreateDto normalUserCreateDto) {
-        final NormalUserDto user = userService.saveNormalUser(normalUserCreateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.CREATED.value())
-                .message("User created successfully")
-                .data(user)
-                .build());
-    }
+//    @PostMapping("/create-user")
+//    public ResponseEntity<ApiResponse<?>> createUser(@Valid @RequestBody NormalUserCreateDto normalUserCreateDto) {
+//        final NormalUserDto user = userService.saveNormalUser(normalUserCreateDto);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder()
+//                .timestamp(LocalDateTime.now())
+//                .status(HttpStatus.CREATED.value())
+//                .message("User created successfully")
+//                .data(user)
+//                .build());
+//    }
 
     @PutMapping("/update-user/{userId}")
     public ResponseEntity<ApiResponse<?>> updateUser(
