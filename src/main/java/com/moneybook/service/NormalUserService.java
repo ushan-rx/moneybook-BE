@@ -11,7 +11,12 @@ import com.moneybook.repository.NormalUserRepo;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -50,5 +55,15 @@ public class NormalUserService {
         NormalUser user = repo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
         return mapper.fromNormalUserToBrief(user);
+    }
+
+    public List<NormalUserBriefDto> searchUsersByName(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return repo.findTop10ByNameContainingExceptUser(searchTerm.trim(), currentUserId).stream()
+                .map(mapper::fromNormalUserToBrief)
+                .collect(Collectors.toList());
     }
 }

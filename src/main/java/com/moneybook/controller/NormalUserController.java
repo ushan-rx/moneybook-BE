@@ -2,7 +2,7 @@ package com.moneybook.controller;
 
 
 import com.moneybook.dto.api.ApiResponse;
-import com.moneybook.dto.user.NormalUserCreateDto;
+import com.moneybook.dto.user.NormalUserBriefDto;
 import com.moneybook.dto.user.NormalUserDto;
 import com.moneybook.dto.user.NormalUserUpdateDto;
 import com.moneybook.exception.ResourceNotFoundException;
@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("${api.base-path}/users")
@@ -33,7 +34,18 @@ public class NormalUserController {
 //                .build());
 //    }
 
-    @PutMapping("/update-user/{userId}")
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<?>> searchUsers(@RequestParam String query) {
+        List<NormalUserBriefDto> users = userService.searchUsersByName(query);
+        return ResponseEntity.ok(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Users found")
+                .data(users)
+                .build());
+    }
+
+    @PutMapping("/{userId}")
     public ResponseEntity<ApiResponse<?>> updateUser(
             @PathVariable String userId,
             @Valid @RequestBody NormalUserUpdateDto normalUserUpdateDto)
