@@ -10,13 +10,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The `FilterSpecification` class is a generic implementation of the `Specification` interface
+ * used to filter and query entities based on a set of criteria.
+ *
+ * @param <T> the type of the entity to be filtered
+ */
 public class FilterSpecification<T> implements Specification<T> {
     private final Map<String, String> filters;
 
+    /**
+     * Constructs a new `FilterSpecification` with the given filters.
+     *
+     * @param filters a map of filter criteria where the key is the field name and the value is the filter value
+     */
     public FilterSpecification(Map<String, String> filters) {
         this.filters = filters;
     }
 
+    /**
+     * Converts the filter criteria into a `Predicate` to be used in a query.
+     *
+     * @param root  the root type in the from clause
+     * @param query the criteria query
+     * @param cb    the criteria builder
+     * @return a `Predicate` representing the filter criteria
+     */
     @NotNull
     @Override
     public Predicate toPredicate(@NotNull Root<T> root, @NotNull CriteriaQuery<?> query, @NotNull CriteriaBuilder cb) {
@@ -50,7 +69,17 @@ public class FilterSpecification<T> implements Specification<T> {
         return cb.and(predicates.toArray(new Predicate[0]));
     }
 
-
+    /**
+     * Adds a numeric predicate to the list of predicates based on the operator.
+     *
+     * @param predicates the list of predicates
+     * @param cb         the criteria builder
+     * @param root       the root type in the from clause
+     * @param field      the field name
+     * @param operator   the operator (e.g., "gte", "lte", "=")
+     * @param value      the numeric value to compare
+     * @param <N>        the type of the numeric value
+     */
     private <N extends Number & Comparable<N>> void addNumberPredicate(
             List<Predicate> predicates, CriteriaBuilder cb,
             Root<T> root, String field, String operator, N value) {
@@ -62,6 +91,16 @@ public class FilterSpecification<T> implements Specification<T> {
         }
     }
 
+    /**
+     * Adds a date predicate to the list of predicates based on the operator.
+     *
+     * @param predicates the list of predicates
+     * @param cb         the criteria builder
+     * @param root       the root type in the from clause
+     * @param field      the field name
+     * @param operator   the operator (e.g., "gte", "lte", "=")
+     * @param value      the date value to compare
+     */
     private void addDatePredicate(
             List<Predicate> predicates, CriteriaBuilder cb,
             Root<T> root, String field, String operator, OffsetDateTime value) {
