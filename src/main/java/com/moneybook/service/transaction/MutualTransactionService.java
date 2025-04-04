@@ -115,9 +115,7 @@ public class MutualTransactionService {
             String userID,
             Map<String, String> filters,
             Pageable pageable) {
-//        Specification<MutualTransaction> specifications = specification.buildSpecification(userID, status, filters);
         Specification<MutualTransaction> specifications = new FilterSpecification<>(filters);
-
         specifications = specifications.and(((root, query, cb) ->  cb.or(cb.equal(root.get("borrowerID"), userID), cb.equal(root.get("lenderID"), userID))));
         return repo.findAll(specifications, pageable).map(mapper::fromMutualTransaction);
     }
