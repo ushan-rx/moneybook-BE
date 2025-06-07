@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FriendRequestCreateDto {
+public class FriendRequestCreateCancelDto {
     @NotNull(message = "senderId cannot be blank")
     private String senderId;
 

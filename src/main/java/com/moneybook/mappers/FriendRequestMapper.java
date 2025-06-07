@@ -1,6 +1,6 @@
 package com.moneybook.mappers;
 
-import com.moneybook.dto.friend.FriendRequestCreateDto;
+import com.moneybook.dto.friend.FriendRequestCreateCancelDto;
 import com.moneybook.dto.friend.FriendRequestDto;
 import com.moneybook.model.FriendRequest;
 import org.mapstruct.InheritConfiguration;
@@ -14,10 +14,10 @@ public interface FriendRequestMapper {
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "requestId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
-    FriendRequest toFriendRequest(FriendRequestCreateDto friendRequestCreateDto);
+    FriendRequest toFriendRequest(FriendRequestCreateCancelDto friendRequestCreateCancelDto);
 
     @InheritConfiguration
+    @Mapping(target = "sender", ignore = true)
     FriendRequestDto fromFriendRequest(FriendRequest friendRequest);
-
 
 }

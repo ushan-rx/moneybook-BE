@@ -1,12 +1,14 @@
 package com.moneybook.controller;
 
-import com.moneybook.dto.friend.*;
-import com.moneybook.service.friend.FriendshipService;
 import com.moneybook.dto.api.ApiResponse;
+import com.moneybook.dto.friend.*;
+import com.moneybook.exception.ResourceNotFoundException;
+import com.moneybook.service.friend.FriendshipService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -20,8 +22,8 @@ public class FriendController {
     private FriendshipService friendshipService;
 
     @PostMapping("/sendFriendRequest")
-    public ResponseEntity<ApiResponse<?>> sendFriendRequest(@Valid @RequestBody FriendRequestCreateDto friendRequestCreateDto) {
-        FriendRequestDto sentRequest = friendshipService.sendFriendRequest(friendRequestCreateDto);
+    public ResponseEntity<ApiResponse<?>> sendFriendRequest(@Valid @RequestBody FriendRequestCreateCancelDto friendRequestCreateCancelDto) {
+        FriendRequestDto sentRequest = friendshipService.sendFriendRequest(friendRequestCreateCancelDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.CREATED.value())
@@ -29,6 +31,31 @@ public class FriendController {
                 .data(sentRequest)
                 .build());
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/getFriendRequest/{userId}")
+    public ResponseEntity<ApiResponse<?>> getFriendRequest(@PathVariable String userId) {
+        FriendRequestDto friendRequest = friendshipService.getFriendRequestByReceiverIdAndSenderId(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Friend request retrieved successfully.")
+                .data(friendRequest)
+                .build());
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/pending")
+    public ResponseEntity<ApiResponse<?>> getPendingFriendRequests() {
+        List<FriendRequestDto> friendRequests = friendshipService.getPendingFriendRequests();
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Friend requests retrieved successfully.")
+                .data(friendRequests)
+                .build());
+    }
+
 
     @PostMapping("/respondFriendRequest")
     public ResponseEntity<ApiResponse<?>> respondFriendRequest(@Valid @RequestBody FriendRequestResponseDto friendRequestResponseDto) {
@@ -52,6 +79,18 @@ public class FriendController {
                 .build());
     }
 
+    @DeleteMapping("/request/{requestId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<?>> cancelFriendRequestById(@PathVariable Long requestId) throws ResourceNotFoundException {
+        FriendRequestDto canceledRequest = friendshipService.cancelFriendRequestById(requestId);
+        return ResponseEntity.ok(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Friend request canceled successfully.")
+                .data(canceledRequest)
+                .build());
+    }
+
     @GetMapping("/{userId}/friendList")
     public ResponseEntity<ApiResponse<?>> getFriends(@PathVariable String userId) {
         List<FriendDto> friends = friendshipService.getFriends(userId);
@@ -62,4 +101,6 @@ public class FriendController {
                 .data(friends)
                 .build());
     }
+
+
 }

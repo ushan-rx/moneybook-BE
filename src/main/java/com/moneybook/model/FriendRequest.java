@@ -1,5 +1,6 @@
 package com.moneybook.model;
 
+import com.moneybook.model.enums.FriendRequestStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -26,8 +27,9 @@ public class FriendRequest {
     @Column(name = "receiver_id")
     private String receiverId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private FriendRequestStatus status = FriendRequestStatus.PENDING;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)

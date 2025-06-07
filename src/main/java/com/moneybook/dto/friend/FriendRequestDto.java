@@ -1,5 +1,7 @@
 package com.moneybook.dto.friend;
 
+import com.moneybook.dto.user.NormalUserBriefDto;
+import com.moneybook.model.enums.FriendRequestStatus;
 import lombok.*;
 
 import java.time.OffsetDateTime;
@@ -14,6 +16,7 @@ public class FriendRequestDto {
     private Long requestId;
     private String senderId;
     private String receiverId;
-    private String status;
+    private FriendRequestStatus status;
     private OffsetDateTime createdAt;
+    private NormalUserBriefDto sender;
 }
