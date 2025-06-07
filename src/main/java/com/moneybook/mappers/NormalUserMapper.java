@@ -13,6 +13,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface NormalUserMapper {
 
+    @Mapping(target = "bio", ignore = true)
     @Mapping(target = "phoneNumber", ignore = true)
     @Mapping(target = "lastName", ignore = true)
     @Mapping(target = "firstName", ignore = true)
@@ -23,6 +24,7 @@ public interface NormalUserMapper {
     NormalUser FromCreateUsertoNormalUser(NormalUserCreateDto dto);
 
     @InheritConfiguration
+    @Mapping(target = "bio", source = "bio")
     NormalUserDto fromNormalUser(NormalUser normalUser);
 
     @InheritConfiguration

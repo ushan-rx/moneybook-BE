@@ -34,6 +34,17 @@ public class NormalUserController {
 //                .build());
 //    }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponse<?>> getUserDetails(@PathVariable String userId) throws ResourceNotFoundException {
+        NormalUserDto user = userService.getUserDetails(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("User details retrieved successfully")
+                .data(user)
+                .build());
+    }
+
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<?>> searchUsers(@RequestParam String query) {
         List<NormalUserBriefDto> users = userService.searchUsersByName(query);

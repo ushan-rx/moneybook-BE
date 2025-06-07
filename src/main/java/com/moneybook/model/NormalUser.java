@@ -40,6 +40,9 @@ public class NormalUser {
     @Column(name = "profile_pic")
     private String profilePicture;
 
+    @Column(name = "bio")
+    private String bio;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     private OffsetDateTime createdAt;

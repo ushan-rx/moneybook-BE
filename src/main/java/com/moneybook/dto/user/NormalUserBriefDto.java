@@ -15,4 +15,5 @@ public class NormalUserBriefDto {
     private String firstName;
     private String lastName;
     private String profilePicture;
+    private String bio;
 }

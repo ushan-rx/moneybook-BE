@@ -32,6 +32,10 @@ public class NormalUserUpdateDto {
 
     private boolean status = true;
 
+    @NotNull(message = "bio cannot be null")
+    @Size(max = 100, message = "Bio must not exceed 100 characters")
+    private String bio;
+
 //    @URL(protocol = "https")
 //    private String profilePicture;
 

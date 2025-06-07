@@ -18,5 +18,6 @@ public class NormalUserDto {
     private String phoneNumber;
     private String address;
     private String profilePicture;
+    private String bio;
     private OffsetDateTime createdAt;
 }

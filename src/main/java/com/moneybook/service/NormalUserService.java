@@ -32,6 +32,12 @@ public class NormalUserService {
         return mapper.fromNormalUser(userCreated);
     }
 
+    public NormalUserDto getUserDetails(String userId) throws ResourceNotFoundException {
+        NormalUser user = repo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+        return mapper.fromNormalUser(user);
+    }
+
     @Transactional
     public NormalUserDto updateNormalUser(String userID, NormalUserUpdateDto dto) throws ResourceNotFoundException {
         NormalUser existingUser = repo.findById(userID)
