@@ -2,6 +2,7 @@ package com.moneybook.dto.user;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.validator.constraints.URL;
 
 
 @Getter
@@ -36,8 +37,8 @@ public class NormalUserUpdateDto {
     @Size(max = 100, message = "Bio must not exceed 100 characters")
     private String bio;
 
-//    @URL(protocol = "https")
-//    private String profilePicture;
+    @URL(protocol = "https")
+    private String profilePicture;
 
 
 //    @NotBlank(message = "Email cannot be blank")

@@ -32,7 +32,6 @@ public interface NormalUserMapper {
     NormalUserBriefDto fromNormalUserToBrief(NormalUser user);
 
     @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "profilePicture", ignore = true)
     @Mapping(target = "groups", ignore = true)
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
