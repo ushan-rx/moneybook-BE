@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -102,5 +103,16 @@ public class FriendController {
                 .build());
     }
 
-
+    @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<?>> searchFriends(@RequestParam String query) {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<FriendBriefDto> friends = friendshipService.searchMyFriends(currentUserId, query);
+        return ResponseEntity.ok(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Friends search completed successfully.")
+                .data(friends)
+                .build());
+    }
 }

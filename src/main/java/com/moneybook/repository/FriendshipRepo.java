@@ -1,5 +1,6 @@
 package com.moneybook.repository;
 
+import com.moneybook.dto.friend.FriendBriefDto;
 import com.moneybook.dto.friend.FriendDto;
 import com.moneybook.model.Friendship;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +19,13 @@ public interface FriendshipRepo extends JpaRepository<Friendship, Long> {
             "JOIN NormalUser u ON f.friendId = u.userId " +
             "WHERE f.userId = :userId")
     List<FriendDto> findFriendsByUserId(@Param("userId") String userId); // For fetching friends
+
+    @Query("SELECT new com.moneybook.dto.friend.FriendBriefDto(u.userId, u.firstName, u.lastName, u.email, u.profilePicture) " +
+           "FROM Friendship f " +
+           "JOIN NormalUser u ON f.friendId = u.userId " +
+           "WHERE f.userId = :userId AND " +
+           "(LOWER(CONCAT(u.firstName, ' ', u.lastName)) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
+    List<FriendBriefDto> searchFriendsByUsernameOrEmail(@Param("userId") String userId, @Param("searchTerm") String searchTerm);
 
     boolean existsByUserIdAndFriendId(String userId, String friendId);
 }

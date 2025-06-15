@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -124,6 +125,14 @@ public class FriendshipService {
 
     public List<FriendDto> getFriends(String userId) {
         return friendshipRepo.findFriendsByUserId(userId);
+    }
+
+
+    public List<FriendBriefDto> searchMyFriends(String currentUserId, String query) {
+//        if (query == null || query.trim().isEmpty()) {
+//            return friendshipRepo.findFriendsByUserId(currentUserId); // Return all friends if query is empty
+//        }
+        return friendshipRepo.searchFriendsByUsernameOrEmail(currentUserId, query.trim());
     }
 
     public List<FriendRequestDto> getPendingFriendRequests() {
