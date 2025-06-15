@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -48,11 +49,36 @@ public class AuthController {
                 .build());
     }
 
+    // This endpoint is used to validate the access token
+    @GetMapping("/validate")
+    public ResponseEntity<?> validateAccessToken(
+            @CookieValue(name = "auth-token", required = false) String accessToken) {
+
+        if (accessToken == null || !jwtUtil.validateAccessToken(accessToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.builder()
+                    .timestamp(LocalDateTime.now())
+                    .status(HttpStatus.UNAUTHORIZED.value())
+                    .message("Invalid or missing access token")
+                    .build());
+        }
+
+        return ResponseEntity.ok(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Access token is valid")
+                .data(Map.of("authenticated", true))
+                .build());
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshAccessToken(@CookieValue(name = "refresh-token", required = false) String refreshToken, HttpServletResponse response) {
         if (refreshToken == null || !jwtUtil.validateRefreshToken(refreshToken)) {
             log.error("Invalid refresh token from :{}", response.getHeader("Referer")); // Log the origin of the request
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.builder()
+                    .timestamp(LocalDateTime.now())
+                    .status(HttpStatus.UNAUTHORIZED.value())
+                    .message("Invalid refresh token")
+                    .build());
         }
 
         String userId = jwtUtil.extractUserIdFromRefreshToken(refreshToken);

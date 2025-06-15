@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -46,7 +47,10 @@ public class SecurityConfig {
 //                                .anyRequest().permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2SuccessHandler))
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(((request, response, exception) -> {
+                            response.sendRedirect("http://localhost:3000/");
+                        })))
                 .addFilterBefore(
                         new JwtFilter(jwtUtil),
                         UsernamePasswordAuthenticationFilter.class
@@ -58,7 +62,7 @@ public class SecurityConfig {
                         .logoutUrl("/api/v1/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
                             JwtUtil.clearCookies(response);
-                            response.sendRedirect("http://localhost:3000/");
+                            response.setStatus(HttpStatus.OK.value());
                         })
                 );
         return http.build();

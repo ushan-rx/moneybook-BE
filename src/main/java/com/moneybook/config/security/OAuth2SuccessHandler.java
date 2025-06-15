@@ -4,6 +4,7 @@ import com.moneybook.dto.user.NormalUserCreateDto;
 import com.moneybook.dto.user.NormalUserDto;
 import com.moneybook.service.NormalUserService;
 import com.moneybook.util.JwtUtil;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -46,6 +47,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 response.sendRedirect("http://localhost:3000/error");
                 return;
             }
+//            response.addCookie(new Cookie("new-user", "true"));
             response.sendRedirect("http://localhost:3000/onboarding");
             return;
         }
