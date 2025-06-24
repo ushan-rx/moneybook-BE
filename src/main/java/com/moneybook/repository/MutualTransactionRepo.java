@@ -27,3 +27,4 @@ public interface MutualTransactionRepo extends JpaRepository<MutualTransaction, 
     int batchUpdateExpiredTransactions(TransactionStatus status, TransactionStatus currentStatus, OffsetDateTime currentDate);
 
 }
+

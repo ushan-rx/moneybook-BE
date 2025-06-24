@@ -45,6 +45,9 @@ public class MutualTransaction {
     @Column(name = "lender_id", nullable = false)
     private String lenderID;
 
+    @Column(name = "requested_to", nullable = false)
+    private String requestedTo;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private TransactionStatus status; // Enum for PENDING, ACCEPTED, REJECTED, CANCELLED

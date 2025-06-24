@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.Base64;
 import java.util.Date;
 
 @Slf4j
@@ -26,12 +25,12 @@ public class JwtUtil {
     private static final long REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 * 60 * 1000;  // 7 days
 
     private SecretKey getAccessSecret() {
-        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
+        byte[] keyBytes = secretKey.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     private SecretKey getRefreshSecret() {
-        byte[] keyBytes = Base64.getDecoder().decode(refreshSecretKey); // Decode Base64
+        byte[] keyBytes = refreshSecretKey.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

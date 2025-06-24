@@ -25,7 +25,7 @@ public class MutualTransCreateDto {
     @DecimalMin(value = "1.0", message = "Amount must be greater than 0")
     private BigDecimal amount;
 
-    @Pattern(regexp = "^[a-zA-Z0-9 .]+$", message = "Description must contain only alphanumeric characters")
+    @Pattern(regexp = "^[a-zA-Z0-9 .]*$", message = "Description must contain only alphanumeric characters")
     @Size(max = 100, message = "Description must be less than 100 characters")
     private String description;
 
@@ -41,4 +41,7 @@ public class MutualTransCreateDto {
 
     @NotNull(message = "Lender ID cannot be null")
     private String lenderID;
+
+    @NotNull(message = "Requested to cannot be null")
+    private String requestedTo;
 }

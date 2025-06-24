@@ -1,5 +1,6 @@
 package com.moneybook.dto.transaction;
 
+import com.moneybook.model.enums.TransactionStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -7,6 +8,6 @@ import lombok.Data;
 public class MutualTransactionManual {
     @NotNull(message = "OTP cannot be null")
     String otp;
-    @NotNull(message = "User ID cannot be null")
-    String userID;
+    @NotNull(message = "Transaction status cannot be null")
+    TransactionStatus status;
 }

@@ -12,13 +12,13 @@ public interface MutualTransactionMapper {
 
     @Mapping(target = "status", constant = "PENDING")
     @Mapping(target = "transactionID", ignore = true)
-    @Mapping(target = "transactionDate", expression = "java(java.time.OffsetDateTime.now())")
     @Mapping(target = "expiryDate", expression = "java(java.time.OffsetDateTime.now().plusHours(24))") // Auto-generate expiry
     @Mapping(target = "otpHash", ignore = true)
     MutualTransaction toMutualTransaction(MutualTransCreateDto mutualTransCreateDto);
 
     @Mapping(target = "qrPayload", ignore = true)
     @Mapping(target = "otp", ignore = true)
+    @Mapping(target = "description", source = "description")
     @InheritConfiguration
     MutualTransactionDto fromMutualTransaction(MutualTransaction mutualTransaction);
 }

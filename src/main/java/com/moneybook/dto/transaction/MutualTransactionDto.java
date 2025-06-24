@@ -21,11 +21,11 @@ public class MutualTransactionDto {
     private BigDecimal amount;
     private OffsetDateTime transactionDate;
     private String transactionType;
+    private String description;
     private String borrowerID;
     private String lenderID;
     private String otp;
     private String status;
+    private String requestedTo;
     private QrPayload qrPayload;
 }
-
-
