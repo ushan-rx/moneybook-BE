@@ -6,6 +6,8 @@ import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.service.friend.FriendshipService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -113,6 +115,33 @@ public class FriendController {
                 .status(HttpStatus.OK.value())
                 .message("Friends search completed successfully.")
                 .data(friends)
+                .build());
+    }
+
+    @GetMapping("/{friendshipId}/summary")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<?>> getFriendSummary(@PathVariable Long friendshipId) throws ResourceNotFoundException {
+        FriendSummaryDto summary = friendshipService.getFriendSummary(friendshipId);
+        return ResponseEntity.ok(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Friend summary retrieved successfully.")
+                .data(summary)
+                .build());
+    }
+
+    @GetMapping("/FriendDetailedList")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<?>> getAllFriendshipDetails(
+            @RequestParam(required = false) String friendName,
+            Pageable pageable) {
+        String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Page<FriendWithTransactionSummaryDto> friendships = friendshipService.getAllFriendshipDetails(currentUserId, friendName, pageable);
+        return ResponseEntity.ok(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Friendship details retrieved successfully.")
+                .data(friendships.getContent())
                 .build());
     }
 }

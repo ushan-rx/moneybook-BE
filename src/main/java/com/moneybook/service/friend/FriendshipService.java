@@ -12,12 +12,13 @@ import com.moneybook.repository.FriendshipRepo;
 import com.moneybook.service.NormalUserService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -68,7 +69,6 @@ public class FriendshipService {
             throw new IllegalStateException("Only the sender can cancel the friend request");
         }
 
-        // Create DTO before deleting for return value
         FriendRequestDto dto = requestMapper.fromFriendRequest(request);
         try {
             NormalUserBriefDto senderDetails = normalUserService.getUserBrief(request.getSenderId());
@@ -154,5 +154,27 @@ public class FriendshipService {
                     return dto;
                 })
                 .toList();
+    }
+
+    public FriendSummaryDto getFriendSummary(Long friendshipId) throws ResourceNotFoundException {
+        FriendSummaryDto summary = friendshipRepo.getFriendSummaryByFriendshipId(friendshipId);
+        if (summary == null) {
+            throw new ResourceNotFoundException("Friend summary information not found.");
+        }
+        return summary;
+    }
+
+    public Page<FriendWithTransactionSummaryDto> getAllFriendshipDetails(String userId, String friendName, Pageable pageable) {
+        if (userId == null || userId.isEmpty()) {
+            throw new IllegalArgumentException("User ID cannot be empty");
+        }
+
+        if (friendName != null && !friendName.trim().isEmpty()) {
+            // If friendName is provided, filter by it
+            return friendshipRepo.findAllFriendshipDetailsByUserIdAndFriendName(userId, friendName.trim(), pageable);
+        } else {
+            // Otherwise, return all friendships
+            return friendshipRepo.findAllFriendshipDetailsByUserId(userId, pageable);
+        }
     }
 }
