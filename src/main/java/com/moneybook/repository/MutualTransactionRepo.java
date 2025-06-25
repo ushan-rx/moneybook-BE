@@ -18,6 +18,8 @@ import java.util.UUID;
 public interface MutualTransactionRepo extends JpaRepository<MutualTransaction, UUID>, JpaSpecificationExecutor<MutualTransaction> {
     List<MutualTransaction> findByStatusAndExpiryDateBefore(TransactionStatus status, OffsetDateTime expiryDate);
 
+    List<MutualTransaction> findByRequestedToAndStatus(String requestedTo, TransactionStatus status);
+
     Page<MutualTransaction> findByBorrowerIDOrLenderID(String borrowerID, String lenderID, Pageable pageable);
 
     Page<MutualTransaction> findByBorrowerIDOrLenderIDAndStatus(String borrowerID, String lenderID, TransactionStatus status, Pageable pageable);
@@ -27,4 +29,3 @@ public interface MutualTransactionRepo extends JpaRepository<MutualTransaction, 
     int batchUpdateExpiredTransactions(TransactionStatus status, TransactionStatus currentStatus, OffsetDateTime currentDate);
 
 }
-

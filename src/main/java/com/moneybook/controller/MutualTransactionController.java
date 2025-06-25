@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -127,6 +128,20 @@ public class MutualTransactionController {
                         .message("Transactions retrieved successfully")
                         .data(response.getContent()) // Send only the content
                         .pagination(ApiUtil.getPagination(response)) // Send pagination details
+                        .build()
+        );
+    }
+
+    // Get all pending transactions requested to the current authenticated user
+    @GetMapping("/pending-requests")
+    public ResponseEntity<ApiResponse<List<MutualTransactionDto>>> getPendingRequests() {
+        List<MutualTransactionDto> pendingTransactions = mutualTransactionService.getAllRequestedPendingTransactions();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.<List<MutualTransactionDto>>builder()
+                        .status(HttpStatus.OK.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("Pending transaction requests retrieved successfully")
+                        .data(pendingTransactions)
                         .build()
         );
     }

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -138,6 +139,16 @@ public class MutualTransactionService {
                 cb.equal(root.get("borrowerID"), userID), cb.equal(root.get("lenderID"), userID))
         ));
         return repo.findAll(specifications, sortedPageable).map(mapper::fromMutualTransaction);
+    }
+
+    // get all requested pending transactions for the current authenticated user
+    public List<MutualTransactionDto> getAllRequestedPendingTransactions() {
+        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<MutualTransaction> pendingTransactions = repo.findByRequestedToAndStatus(
+                currentUser, TransactionStatus.PENDING);
+        return pendingTransactions.stream()
+                .map(mapper::fromMutualTransaction)
+                .collect(java.util.stream.Collectors.toList());
     }
 
     // get mutual transactions between two users with optional filters
