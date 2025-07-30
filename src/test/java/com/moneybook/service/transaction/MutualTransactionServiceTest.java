@@ -43,9 +43,6 @@ class MutualTransactionServiceTest {
     private MutualTransactionRepo transactionRepo;
 
     @Mock
-    private FriendBalanceRepo friendBalanceRepo;
-
-    @Mock
     private RedisTemplate<String, String> redisTemplate;
 
     @Mock

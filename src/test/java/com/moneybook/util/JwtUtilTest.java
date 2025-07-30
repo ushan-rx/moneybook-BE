@@ -37,7 +37,7 @@ class JwtUtilTest {
         String token = jwtUtil.generateAccessToken(userId);
 
         assertNotNull(token);
-        assertTrue(token.length() > 0);
+        assertFalse(token.isEmpty());
         assertTrue(jwtUtil.validateAccessToken(token));
     }
 
@@ -47,7 +47,7 @@ class JwtUtilTest {
         String token = jwtUtil.generateRefreshToken(userId);
 
         assertNotNull(token);
-        assertTrue(token.length() > 0);
+        assertFalse(token.isEmpty());
     }
 
     @Test
