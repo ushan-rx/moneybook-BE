@@ -8,6 +8,7 @@ import com.moneybook.mappers.MutualTransactionMapper;
 import com.moneybook.model.MutualTransaction;
 import com.moneybook.model.enums.TransactionStatus;
 import com.moneybook.model.enums.TransactionType;
+import com.moneybook.repository.FriendBalanceRepo;
 import com.moneybook.repository.MutualTransactionRepo;
 import com.moneybook.util.OtpUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,9 @@ class MutualTransactionServiceTest {
 
     @Mock
     private MutualTransactionRepo transactionRepo;
+
+    @Mock
+    private FriendBalanceRepo friendBalanceRepo;
 
     @Mock
     private RedisTemplate<String, String> redisTemplate;
