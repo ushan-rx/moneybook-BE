@@ -45,6 +45,10 @@ jobs:
           SPRING_PROFILES_ACTIVE: test
           SPRING_REDIS_HOST: localhost
           SPRING_REDIS_PORT: 6379
+          JWT_ACCESS_SECRET_KEY: ${{ secrets.JWT_ACCESS_SECRET_KEY }}
+          JWT_REFRESH_SECRET_KEY: ${{ secrets.JWT_REFRESH_SECRET_KEY }}
+          OAUTH2_CLIENT_ID: test-client-id
+          OAUTH2_CLIENT_SECRET: test-client-secret
         run: mvn -B verify
 
       - name: Generate test coverage report
