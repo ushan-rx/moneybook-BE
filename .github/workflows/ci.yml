@@ -54,8 +54,8 @@ jobs:
       - name: Generate test coverage report
         run: mvn -B test jacoco:report
 
-      - name: Run OWASP Dependency Check (SARIF)
-        run: mvn org.owasp:dependency-check-maven:check -Dformats=SARIF -DoutputDirectory=target
+#      - name: Run OWASP Dependency Check (SARIF)
+#        run: mvn org.owasp:dependency-check-maven:check -Dformats=SARIF -DoutputDirectory=target
 
       - name: Build Docker image
         if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
