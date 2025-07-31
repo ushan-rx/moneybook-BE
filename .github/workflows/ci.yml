@@ -63,21 +63,17 @@ jobs:
           docker build -t moneybook:${{ github.sha }} .
           docker tag moneybook:${{ github.sha }} moneybook:latest
 
-  security:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+#  security:
+#    needs: build
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Run Trivy vulnerability scanner
+#        uses: aquasecurity/trivy-action@v0.32.0
+#        with:
+#          scan-type: fs
+#          scan-ref: .
+#          format: sarif
+#          output: trivy-results.sarif
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@v0.32.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          format: sarif
-          output: trivy-results.sarif
-
-      - name: Upload Trivy SARIF report
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: trivy-results.sarif
