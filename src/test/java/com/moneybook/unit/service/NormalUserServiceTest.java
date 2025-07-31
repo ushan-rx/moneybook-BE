@@ -1,4 +1,4 @@
-package com.moneybook.service;
+package com.moneybook.unit.service;
 
 import com.moneybook.dto.user.NormalUserBriefDto;
 import com.moneybook.dto.user.NormalUserCreateDto;
@@ -8,6 +8,7 @@ import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.mappers.NormalUserMapper;
 import com.moneybook.model.NormalUser;
 import com.moneybook.repository.NormalUserRepo;
+import com.moneybook.service.NormalUserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

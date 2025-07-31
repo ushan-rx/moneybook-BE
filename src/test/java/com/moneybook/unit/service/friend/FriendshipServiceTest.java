@@ -1,4 +1,4 @@
-package com.moneybook.service.friend;
+package com.moneybook.unit.service.friend;
 
 import com.moneybook.dto.friend.*;
 import com.moneybook.dto.user.NormalUserBriefDto;
@@ -9,6 +9,7 @@ import com.moneybook.model.enums.FriendRequestStatus;
 import com.moneybook.repository.FriendRequestRepo;
 import com.moneybook.repository.FriendshipRepo;
 import com.moneybook.service.NormalUserService;
+import com.moneybook.service.friend.FriendshipService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -324,7 +325,7 @@ class FriendshipServiceTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
-        assertEquals(FRIEND_ID, result.get(0).getUserId());
+        assertEquals(FRIEND_ID, result.getFirst().getUserId());
     }
 
     @Test
@@ -348,8 +349,8 @@ class FriendshipServiceTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
-        assertEquals(FRIEND_ID, result.get(0).getUserId());
-        assertEquals("John", result.get(0).getFirstName());
+        assertEquals(FRIEND_ID, result.getFirst().getUserId());
+        assertEquals("John", result.getFirst().getFirstName());
     }
 
     @Test
@@ -383,9 +384,9 @@ class FriendshipServiceTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
-        assertEquals(FRIEND_ID, result.get(0).getSenderId());
-        assertEquals(USER_ID, result.get(0).getReceiverId());
-        assertEquals(senderDetails, result.get(0).getSender());
+        assertEquals(FRIEND_ID, result.getFirst().getSenderId());
+        assertEquals(USER_ID, result.getFirst().getReceiverId());
+        assertEquals(senderDetails, result.getFirst().getSender());
     }
 
     @Test
@@ -460,7 +461,7 @@ class FriendshipServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals("John Doe", result.getContent().get(0).getFriendName());
+        assertEquals("John Doe", result.getContent().getFirst().getFriendName());
     }
 
     @Test
@@ -488,7 +489,7 @@ class FriendshipServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals("John Doe", result.getContent().get(0).getFriendName());
+        assertEquals("John Doe", result.getContent().getFirst().getFriendName());
     }
 
     @Test

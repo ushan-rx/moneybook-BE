@@ -1,4 +1,4 @@
-package com.moneybook.service.transaction;
+package com.moneybook.unit.service.transaction;
 
 import com.moneybook.dto.transaction.PersonalTransactionCreateDto;
 import com.moneybook.dto.transaction.PersonalTransactionDto;
@@ -7,6 +7,7 @@ import com.moneybook.mappers.PersonalTransactionMapper;
 import com.moneybook.model.PersonalTransaction;
 import com.moneybook.repository.NormalUserRepo;
 import com.moneybook.repository.PersonalTransactionRepo;
+import com.moneybook.service.transaction.PersonalTransactionService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

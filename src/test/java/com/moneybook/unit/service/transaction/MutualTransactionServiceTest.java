@@ -1,6 +1,8 @@
-package com.moneybook.service.transaction;
+package com.moneybook.unit.service.transaction;
 
-import com.moneybook.dto.transaction.*;
+import com.moneybook.dto.transaction.MutualTransCreateDto;
+import com.moneybook.dto.transaction.MutualTransactionDto;
+import com.moneybook.dto.transaction.MutualTransactionManual;
 import com.moneybook.exception.InvalidOtpException;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.exception.UserMismatchException;
@@ -10,6 +12,7 @@ import com.moneybook.model.enums.TransactionStatus;
 import com.moneybook.model.enums.TransactionType;
 import com.moneybook.repository.FriendBalanceRepo;
 import com.moneybook.repository.MutualTransactionRepo;
+import com.moneybook.service.transaction.MutualTransactionService;
 import com.moneybook.util.OtpUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

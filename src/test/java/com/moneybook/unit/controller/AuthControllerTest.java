@@ -1,5 +1,6 @@
-package com.moneybook.controller;
+package com.moneybook.unit.controller;
 
+import com.moneybook.controller.AuthController;
 import com.moneybook.dto.user.NormalUserBriefDto;
 import com.moneybook.service.NormalUserService;
 import com.moneybook.util.JwtUtil;
@@ -12,8 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {

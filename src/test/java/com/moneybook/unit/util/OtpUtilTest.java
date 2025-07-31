@@ -1,5 +1,6 @@
-package com.moneybook.util;
+package com.moneybook.unit.util;
 
+import com.moneybook.util.OtpUtil;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

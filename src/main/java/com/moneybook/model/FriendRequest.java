@@ -29,6 +29,7 @@ public class FriendRequest {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
+    @Builder.Default
     private FriendRequestStatus status = FriendRequestStatus.PENDING;
 
     @CreationTimestamp
