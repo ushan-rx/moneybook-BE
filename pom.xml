@@ -222,6 +222,19 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>8.4.3</version>
+                <configuration>
+                    <format>ALL</format>
+                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <suppressionFiles>
+                        <suppressionFile>security/dependency-check-suppressions.xml</suppressionFile>
+                    </suppressionFiles>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

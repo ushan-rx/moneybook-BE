@@ -54,12 +54,6 @@ jobs:
       - name: Generate test coverage report
         run: mvn -B test jacoco:report
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          file: target/site/jacoco/jacoco.xml
-          fail_ci_if_error: true
-
       - name: Run OWASP Dependency Check (SARIF)
         run: mvn org.owasp:dependency-check-maven:check \
           -Dformats=SARIF \
