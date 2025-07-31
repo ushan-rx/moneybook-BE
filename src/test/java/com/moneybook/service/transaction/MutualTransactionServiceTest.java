@@ -8,7 +8,6 @@ import com.moneybook.mappers.MutualTransactionMapper;
 import com.moneybook.model.MutualTransaction;
 import com.moneybook.model.enums.TransactionStatus;
 import com.moneybook.model.enums.TransactionType;
-import com.moneybook.repository.FriendBalanceRepo;
 import com.moneybook.repository.MutualTransactionRepo;
 import com.moneybook.util.OtpUtil;
 import org.junit.jupiter.api.BeforeEach;
