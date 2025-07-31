@@ -155,11 +155,6 @@
             <artifactId>jnanoid-enhanced</artifactId>
             <version>ce801e2bda</version>
         </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
 
     </dependencies>
     <repositories>
