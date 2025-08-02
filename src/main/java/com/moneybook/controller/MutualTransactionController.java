@@ -162,6 +162,21 @@ public class MutualTransactionController {
         );
     }
 
+    @GetMapping("/transaction/{transactionId}")
+    public ResponseEntity<ApiResponse<?>> getTransactionById(@PathVariable UUID transactionId)
+            throws ResourceNotFoundException {
+        MutualTransactionDto transaction = mutualTransactionService.getTransactionById(transactionId);
+        if (transaction == null) {
+            throw new ResourceNotFoundException("Transaction not found with ID: " + transactionId);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Transaction retrieved successfully")
+                .data(transaction)
+                .build());
+    }
+
     // Get mutual transactions between two users
     @GetMapping("/between")
     public ResponseEntity<ApiResponse<?>> getMutualTransactionsBetweenUsers(

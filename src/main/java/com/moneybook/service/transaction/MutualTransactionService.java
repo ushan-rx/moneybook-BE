@@ -278,4 +278,9 @@ public class MutualTransactionService {
         return mapper.fromMutualTransaction(transaction);
     }
 
+    public MutualTransactionDto getTransactionById(UUID transactionId) throws ResourceNotFoundException {
+        MutualTransaction transaction = repo.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with ID: " + transactionId));
+        return mapToDto(transaction);
+    }
 }
