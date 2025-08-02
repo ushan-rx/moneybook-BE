@@ -1,11 +1,10 @@
 package com.moneybook.service.transaction;
 
-import com.moneybook.dto.transaction.PersonalTransactionCreateDto;
-import com.moneybook.dto.transaction.PersonalTransactionDto;
-import com.moneybook.dto.transaction.PersonalTransactionUpdateDto;
+import com.moneybook.dto.transaction.*;
 import com.moneybook.exception.ResourceNotFoundException;
 import com.moneybook.mappers.PersonalTransactionMapper;
 import com.moneybook.model.PersonalTransaction;
+import com.moneybook.model.enums.TransactionCategories;
 import com.moneybook.repository.NormalUserRepo;
 import com.moneybook.repository.PersonalTransactionRepo;
 import com.moneybook.util.FilterSpecification;
@@ -14,8 +13,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -83,4 +89,62 @@ public class PersonalTransactionService {
         return repo.findAll(specifications, pageable).map(mapper::fromPersonalTransaction);
     }
 
+    public PersonalTransactionBriefDto getCategoryExpenseBrief(String dateFrom, String dateTo) {
+
+        OffsetDateTime dateFromParsed = OffsetDateTime.parse(dateFrom);
+        OffsetDateTime dateToParsed = OffsetDateTime.parse(dateTo);
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<CategoryExpenseBriefDTO> categoryExpenseData = repo.getPersonalExpenseSummaryByCategory(dateFromParsed, dateToParsed, userId);
+        BigDecimal totalIncome = repo.getTotalIncomeForDateRange(dateFromParsed, dateToParsed, userId);
+        if (categoryExpenseData.isEmpty()) {
+            return new PersonalTransactionBriefDto(Collections.emptyList(), totalIncome, BigDecimal.ZERO);
+        }
+
+        // Calculate total expense amount
+        BigDecimal totalExpense = new BigDecimal(0);
+        for (CategoryExpenseBriefDTO data : categoryExpenseData) {
+            totalExpense = totalExpense.add(data.getTotalExpense());
+        }
+
+        // Calculate 80% threshold
+        BigDecimal eightyPercentThreshold = totalExpense.multiply(new BigDecimal("0.8"));
+
+        List<CategoryExpenseBriefDTO> result = new ArrayList<>();
+        BigDecimal runningTotal = new BigDecimal(0);
+        BigDecimal otherTotal = new BigDecimal(0);
+
+        // Process each category
+        for (CategoryExpenseBriefDTO data : categoryExpenseData) {
+            String categoryName = data.getCategory().toString();
+            BigDecimal amount = data.getTotalExpense();
+
+            runningTotal = runningTotal.add(amount);
+
+            // If covered more than 80% of expenses, add remaining categories to "Other"
+            if (runningTotal.compareTo(eightyPercentThreshold) > 0 && !result.isEmpty()) {
+                otherTotal = otherTotal.add(amount);
+            } else {
+                // Add as individual category
+                result.add(CategoryExpenseBriefDTO.builder()
+                        .category(TransactionCategories.valueOf(categoryName))
+                        .totalExpense(amount)
+                        .build());
+            }
+        }
+
+        // Add "Others" category if there are any expenses in it
+        if (otherTotal.compareTo(BigDecimal.ZERO) > 0) {
+            result.add(CategoryExpenseBriefDTO.builder()
+                    .category(TransactionCategories.OTHERS)
+                    .totalExpense(otherTotal)
+                    .build());
+        }
+
+        return PersonalTransactionBriefDto.builder()
+                .categoryExpenses(result)
+                .totalEarnings(totalIncome)
+                .totalSpends(totalExpense)
+                .build();
+    }
 }

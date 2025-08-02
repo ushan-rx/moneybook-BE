@@ -1,6 +1,7 @@
 package com.moneybook.controller;
 
 import com.moneybook.dto.api.ApiResponse;
+import com.moneybook.dto.transaction.PersonalTransactionBriefDto;
 import com.moneybook.dto.transaction.PersonalTransactionCreateDto;
 import com.moneybook.dto.transaction.PersonalTransactionDto;
 import com.moneybook.dto.transaction.PersonalTransactionUpdateDto;
@@ -22,6 +23,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("${api.base-path}/personal-transactions")
+@CrossOrigin(origins = "http://localhost:3000")
 public class PersonalTransactionController {
 
     @Autowired
@@ -96,6 +98,20 @@ public class PersonalTransactionController {
                 .message("Transactions retrieved successfully")
                 .data(response.getContent())
                 .pagination(ApiUtil.getPagination(response))
+                .build());
+    }
+
+    @GetMapping("/brief")
+    public ResponseEntity<ApiResponse<?>> getCategoryExpenseBrief(
+            @RequestParam("fromDate") String fromDate,
+            @RequestParam("toDate") String toDate) {
+
+        var categoryExpenseBrief = personalTransactionService.getCategoryExpenseBrief(fromDate, toDate);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Category expense brief retrieved successfully")
+                .data(categoryExpenseBrief)
                 .build());
     }
 }
