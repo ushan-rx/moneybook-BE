@@ -76,7 +76,7 @@ public class MutualTransactionService {
     }
 
     @Transactional
-    public MutualTransactionDto transactionManualRespond(UUID transactionID, MutualTransactionManual manualData)
+    public MutualTransactionDto transactionManualAccept(UUID transactionID, MutualTransactionManual manualData)
             throws UserMismatchException, InvalidOtpException, ResourceNotFoundException {
         validateOtp(transactionID, manualData.getOtp());
         MutualTransactionDto response =  updateTransactionStatus(transactionID, manualData.getStatus());
@@ -85,6 +85,21 @@ public class MutualTransactionService {
         }
         redisTemplate.delete("transaction:" + transactionID);
         return response;
+    }
+
+    // This method marks a transaction as rejected by the responder.
+    public MutualTransactionDto rejectTransaction(UUID transactionID)
+            throws UserMismatchException, ResourceNotFoundException {
+        MutualTransaction transaction = fetchAndValidateTransactionAndResponder(transactionID);
+        // Check if the transaction is already accepted
+        if (transaction.getStatus() == TransactionStatus.ACCEPTED) {
+            throw new IllegalArgumentException("Transaction already accepted");
+        }
+        transaction.setStatus(TransactionStatus.REJECTED);
+        repo.save(transaction);
+        // Remove transaction data from Redis
+        redisTemplate.delete("transaction:" + transactionID);
+        return mapToDto(transaction);
     }
 
     @Transactional
@@ -109,6 +124,8 @@ public class MutualTransactionService {
         }
         transaction.setStatus(status);
         repo.save(transaction);
+        // Remove transaction data from Redis
+        redisTemplate.delete("transaction:" + transactionID);
         log.info("Transaction ID {} marked as {} by user ID {}", transactionID, status);
         return mapToDto(transaction);
     }
@@ -124,6 +141,8 @@ public class MutualTransactionService {
         }
         transaction.setStatus(TransactionStatus.CANCELLED);
         repo.save(transaction);
+        // Remove transaction data from Redis
+        redisTemplate.delete("transaction:" + transactionID);
         log.info("Transaction ID {} marked as {} by user ID {}", transactionID, TransactionStatus.CANCELLED);
         return mapToDto(transaction);
     }
@@ -258,4 +277,5 @@ public class MutualTransactionService {
     private MutualTransactionDto mapToDto(MutualTransaction transaction) {
         return mapper.fromMutualTransaction(transaction);
     }
+
 }

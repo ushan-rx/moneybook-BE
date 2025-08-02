@@ -69,12 +69,28 @@ public class MutualTransactionController {
             @PathVariable UUID transactionID,
             @Valid @RequestBody MutualTransactionManual manualData)
             throws UserMismatchException, InvalidOtpException, ResourceNotFoundException {
-        MutualTransactionDto response = mutualTransactionService.transactionManualRespond(transactionID, manualData);
+        MutualTransactionDto response = mutualTransactionService.transactionManualAccept(transactionID, manualData);
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.<MutualTransactionDto>builder()
                         .status(HttpStatus.OK.value())
                         .timestamp(LocalDateTime.now())
                         .message("Transaction accepted successfully")
+                        .data(response)
+                        .build()
+        );
+    }
+
+    // Reject transaction
+    @PostMapping("/{transactionID}/reject")
+    public ResponseEntity<ApiResponse<MutualTransactionDto>> rejectTransaction(
+            @PathVariable UUID transactionID)
+            throws UserMismatchException, ResourceNotFoundException {
+        MutualTransactionDto response = mutualTransactionService.rejectTransaction(transactionID);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.<MutualTransactionDto>builder()
+                        .status(HttpStatus.OK.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("Transaction rejected successfully")
                         .data(response)
                         .build()
         );
