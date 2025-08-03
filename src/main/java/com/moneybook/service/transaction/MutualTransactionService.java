@@ -10,6 +10,7 @@ import com.moneybook.model.MutualTransaction;
 import com.moneybook.model.enums.TransactionStatus;
 import com.moneybook.repository.FriendBalanceRepo;
 import com.moneybook.repository.MutualTransactionRepo;
+import com.moneybook.repository.NormalUserRepo;
 import com.moneybook.util.FilterSpecification;
 import com.moneybook.util.OtpUtil;
 import jakarta.transaction.Transactional;
@@ -42,6 +43,7 @@ public class MutualTransactionService {
     private final FriendBalanceRepo friendBalanceRepo;
     private final RedisTemplate<String, String> redisTemplate;
     private final MutualTransactionMapper mapper;
+    private final NormalUserRepo normalUserRepo;
 
     @Transactional
     public MutualTransactionDto createTransaction(MutualTransCreateDto dto) {
@@ -282,5 +284,25 @@ public class MutualTransactionService {
         MutualTransaction transaction = repo.findById(transactionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with ID: " + transactionId));
         return mapToDto(transaction);
+    }
+
+    @Transactional
+    public Page<MutualTransactionsAllDto> getAllMutualTransactionsByUserId(
+            String userId,
+            Map<String, String> filters,
+            Pageable pageable) throws ResourceNotFoundException {
+        // Validate user exists
+        normalUserRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+
+        // Create pageable with sorting by transaction date descending
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("transactionDate").descending()
+        );
+
+        // Use the custom repository method that supports both JOINs and dynamic filtering
+        return repo.findAllTransactionsWithFriendNamesAndFilters(userId, filters, sortedPageable);
     }
 }

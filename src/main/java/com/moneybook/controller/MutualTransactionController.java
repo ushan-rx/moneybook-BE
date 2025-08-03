@@ -6,6 +6,7 @@ import com.moneybook.dto.transaction.MutualTransCreateDto;
 import com.moneybook.dto.transaction.MutualTransactionDto;
 import com.moneybook.dto.transaction.MutualTransactionManual;
 import com.moneybook.dto.transaction.MutualTransactionQr;
+import com.moneybook.dto.transaction.MutualTransactionsAllDto;
 import com.moneybook.dto.transaction.filters.MutualTransactionFilter;
 import com.moneybook.exception.InvalidOtpException;
 import com.moneybook.exception.ResourceNotFoundException;
@@ -186,6 +187,26 @@ public class MutualTransactionController {
             Pageable pageable) {
         Map<String, String> filters = ApiUtil.getFilters(filterRequest);
         Page<MutualTransactionDto> response = mutualTransactionService.getMutualTransactionsBetweenUsers(user1, user2, filters, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                ApiResponse.builder()
+                        .status(HttpStatus.OK.value())
+                        .timestamp(LocalDateTime.now())
+                        .message("Mutual transactions retrieved successfully")
+                        .data(response.getContent())
+                        .pagination(ApiUtil.getPagination(response))
+                        .build()
+        );
+    }
+
+    // Get all mutual transactions for a user
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<ApiResponse<?>> getAllMutualTransactions(
+            @PathVariable String userId,
+            @Valid @ModelAttribute MutualTransactionFilter filterRequest,
+            Pageable pageable) throws ResourceNotFoundException {
+        Map<String, String> filters = ApiUtil.getFilters(filterRequest);
+        Page<MutualTransactionsAllDto> response = mutualTransactionService.getAllMutualTransactionsByUserId(userId, filters, pageable);
+
         return ResponseEntity.status(HttpStatus.OK).body(
                 ApiResponse.builder()
                         .status(HttpStatus.OK.value())
