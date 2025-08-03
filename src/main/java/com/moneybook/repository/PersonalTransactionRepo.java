@@ -38,4 +38,22 @@ public interface PersonalTransactionRepo extends JpaRepository<PersonalTransacti
                                         @Param("dateTo") OffsetDateTime dateTo,
                                         @Param("userId") String userId);
 
+    @Query("SELECT SUM(pt.transactionAmount) " +
+           "FROM PersonalTransaction pt " +
+           "WHERE pt.transactionType = 'Expense' " +
+           "AND pt.transactionDate >= :dateFrom " +
+           "AND pt.transactionDate <= :dateTo " +
+           "AND pt.userId = :userId")
+    BigDecimal getTotalExpenseForDateRange(@Param("dateFrom") OffsetDateTime dateFrom,
+                                         @Param("dateTo") OffsetDateTime dateTo,
+                                         @Param("userId") String userId);
+
+    @Query("SELECT COUNT(pt) " +
+           "FROM PersonalTransaction pt " +
+           "WHERE pt.userId = :userId " +
+           "AND pt.transactionDate >= :dateFrom " +
+           "AND pt.transactionDate <= :dateTo")
+    Long countByUserIdAndDateRange(@Param("userId") String userId,
+                                  @Param("dateFrom") OffsetDateTime dateFrom,
+                                  @Param("dateTo") OffsetDateTime dateTo);
 }

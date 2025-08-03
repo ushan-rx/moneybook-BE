@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -52,4 +53,39 @@ public interface MutualTransactionRepo extends JpaRepository<MutualTransaction, 
            "LEFT JOIN NormalUser lender ON mt.lenderID = lender.userId " +
            "WHERE (mt.borrowerID = :userId OR mt.lenderID = :userId)")
     Page<MutualTransactionsAllDto> findAllTransactionsWithFriendNamesByUserId(@Param("userId") String userId, Pageable pageable);
+
+    @Query("SELECT SUM(mt.amount) " +
+           "FROM MutualTransaction mt " +
+           "WHERE mt.lenderID = :userId " +
+           "AND mt.status = 'ACCEPTED' " +
+           "AND mt.transactionDate >= :dateFrom " +
+           "AND mt.transactionDate <= :dateTo")
+    BigDecimal getTotalLentByUser(@Param("userId") String userId,
+                                  @Param("dateFrom") OffsetDateTime dateFrom,
+                                  @Param("dateTo") OffsetDateTime dateTo);
+
+    @Query("SELECT SUM(mt.amount) " +
+           "FROM MutualTransaction mt " +
+           "WHERE mt.borrowerID = :userId " +
+           "AND mt.status = 'ACCEPTED' " +
+           "AND mt.transactionDate >= :dateFrom " +
+           "AND mt.transactionDate <= :dateTo")
+    BigDecimal getTotalBorrowedByUser(@Param("userId") String userId,
+                                      @Param("dateFrom") OffsetDateTime dateFrom,
+                                      @Param("dateTo") OffsetDateTime dateTo);
+
+    @Query("SELECT COUNT(mt) " +
+           "FROM MutualTransaction mt " +
+           "WHERE (mt.borrowerID = :userId OR mt.lenderID = :userId) " +
+           "AND mt.status = 'PENDING'")
+    Integer countPendingTransactionsByUser(@Param("userId") String userId);
+
+    @Query("SELECT COUNT(mt) " +
+           "FROM MutualTransaction mt " +
+           "WHERE (mt.borrowerID = :userId OR mt.lenderID = :userId) " +
+           "AND mt.transactionDate >= :dateFrom " +
+           "AND mt.transactionDate <= :dateTo")
+    Long countByUserAndDateRange(@Param("userId") String userId,
+                                @Param("dateFrom") OffsetDateTime dateFrom,
+                                @Param("dateTo") OffsetDateTime dateTo);
 }
