@@ -11,19 +11,16 @@ import com.moneybook.util.FilterSpecification;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -146,5 +143,31 @@ public class PersonalTransactionService {
                 .totalEarnings(totalIncome)
                 .totalSpends(totalExpense)
                 .build();
+    }
+
+    @Transactional
+    public Page<PersonalTransactionDto> getAllPersonalTransactionsByUserId(
+            String userId,
+            Map<String, String> filters,
+            Pageable pageable) throws ResourceNotFoundException {
+        // Validate user exists
+        normalUserRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " not found"));
+
+        // Add userId to filters
+        filters.put("userId", userId);
+
+        // Create specification with filters
+        Specification<PersonalTransaction> specifications = new FilterSpecification<>(filters);
+
+        // Create pageable with sorting by transaction date descending
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("transactionDate").descending()
+        );
+
+        return repo.findAll(specifications, sortedPageable)
+                .map(mapper::fromPersonalTransaction);
     }
 }

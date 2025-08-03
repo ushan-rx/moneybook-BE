@@ -1,7 +1,6 @@
 package com.moneybook.controller;
 
 import com.moneybook.dto.api.ApiResponse;
-import com.moneybook.dto.transaction.PersonalTransactionBriefDto;
 import com.moneybook.dto.transaction.PersonalTransactionCreateDto;
 import com.moneybook.dto.transaction.PersonalTransactionDto;
 import com.moneybook.dto.transaction.PersonalTransactionUpdateDto;
@@ -112,6 +111,23 @@ public class PersonalTransactionController {
                 .status(HttpStatus.OK.value())
                 .message("Category expense brief retrieved successfully")
                 .data(categoryExpenseBrief)
+                .build());
+    }
+
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<ApiResponse<?>> getAllPersonalTransactions(
+            @PathVariable String userId,
+            @Valid @ModelAttribute PersonalTransactionFilter filterRequest,
+            Pageable pageable) throws ResourceNotFoundException {
+        Map<String, String> filters = ApiUtil.getFilters(filterRequest);
+        Page<PersonalTransactionDto> response = personalTransactionService.getAllPersonalTransactionsByUserId(userId, filters, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.OK.value())
+                .message("Personal transactions retrieved successfully")
+                .data(response.getContent())
+                .pagination(ApiUtil.getPagination(response))
                 .build());
     }
 }
