@@ -1,0 +1,141 @@
+name: CD - Build, Scan, Deploy to AWS ECS
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: "Environment (prod/staging)"
+        type: choice
+        required: true
+        default: prod
+        options: [ prod, staging ]
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write      # for OIDC to AWS
+  contents: read
+  packages: write
+
+env:
+  AWS_REGION: us-east-1                      # adjust
+  ECR_REPOSITORY: moneybook                  # adjust (must exist in ECR)
+  CONTAINER_NAME: moneybook                  # must match template container name
+  ECS_CLUSTER: moneybook-cluster             # adjust
+  ECS_SERVICE: moneybook-service             # adjust
+  JAVA_VERSION: '21'
+  MAVEN_OPTS: -DskipTests=false
+  # Fail build on high CVSS (mirrors pom config). Can change threshold in pom or skip scan by setting to ''
+  CVSS_THRESHOLD: '7'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Maven Unit + Integration Tests
+        run: ./mvnw -B clean verify
+
+      - name: Upload JaCoCo Report (Artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco
+
+      - name: (Optional) Dependency Vulnerability Report
+        if: env.CVSS_THRESHOLD != ''
+        run: |
+          ./mvnw org.owasp:dependency-check-maven:aggregate -Dformat=HTML -DfailOnError=false || true
+          if grep -q "CVSS >= ${CVSS_THRESHOLD}" target/dependency-check-report.html || false; then
+            echo "::warning::High severity vulnerabilities detected (>= ${CVSS_THRESHOLD}). Review the report.";
+          fi
+      - name: Upload Dependency Check Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: target/dependency-check-report.*
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Compute Image Tag
+        id: meta
+        run: |
+          SHA_TAG=${GITHUB_SHA::12}
+          DATE_TAG=$(date +%Y%m%d-%H%M)
+          IMAGE_TAG="$DATE_TAG-$SHA_TAG"
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Build & Push Image
+        id: build-image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_URI=${REGISTRY}/${ECR_REPOSITORY}:${{ steps.meta.outputs.image_tag }}
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+          echo "image=$IMAGE_URI" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}  # IAM role with ECR + ECS + SecretsManager + SSM access
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Prepare Task Definition from Template
+        run: |
+          sed "s/123456789012/${{ secrets.AWS_ACCOUNT_ID }}/g" ecs-task-def-template.json > task-def.json
+          # Optionally switch region placeholder if template differs
+          # sed -i "s/us-east-1/${{ env.AWS_REGION }}/g" task-def.json
+
+      - name: Inject Image into Task Definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-def.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy to ECS Service (Fargate)
+        id: deploy-ecs
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Post Deployment Health Check
+        run: |
+          echo "Deployment finished. Image: ${{ steps.build-image.outputs.image }}"
+
+      - name: Notify (Example Placeholder)
+        if: always()
+        run: |
+          echo "You can integrate Slack or Teams notification here. Status: ${{ job.status }}"
+
+  # Optional separate job to deploy only when manually triggered with staging
+  promote-to-prod:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'prod'
+    needs: [ build-and-deploy ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder
+        run: echo "Prod promotion logic can be added (blue/green, traffic shifting, etc.)."
+
